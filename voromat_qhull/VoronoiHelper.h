@@ -46,8 +46,8 @@ private:
 public:
     VoronoiHelper(SurfaceMeshModel* mesh, StarlabDrawArea* drawArea) : SurfaceMeshHelper(mesh){
         this->drawArea = drawArea;
-        vangle = mesh->add_vertex_property<Scalar>("v:angle",NAN);
-        vradii = mesh->add_vertex_property<Scalar>("v:radii",NAN);
+        vangle = mesh->add_vertex_property<Scalar>("v:angle",0);
+        vradii = mesh->add_vertex_property<Scalar>("v:radii",0);
     }
 
     void computeVoronoiDiagram()

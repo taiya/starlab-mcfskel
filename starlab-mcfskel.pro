@@ -3,5 +3,5 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += voromat_qhull
-SUBDIRS += mcfskel
+#SUBDIRS += mcfskel
 #SUBDIRS += solvertest

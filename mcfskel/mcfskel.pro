@@ -5,5 +5,3 @@ STARLAB_EXTERNAL += eigen
 
 HEADERS += mcfskel.h
 SOURCES += mcfskel.cpp
- 
-include(matlab.pri)
