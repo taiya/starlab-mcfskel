@@ -3,59 +3,48 @@
 #include "StatisticsHelper.h"
 #include "ColorizeHelper.h"
 
-void voromat::applyFilter(Document* doc, RichParameterSet* /*pars*/, StarlabDrawArea* drawArea){
-    /// Remove any extra stuff I might have added
-    drawArea->deleteAllRenderObjects();
-
-    /// Are you applying filter on an appropriate model?
-    Model* selectedModel = doc->selectedModel();
-    SurfaceMeshModel* input = qobject_cast<SurfaceMeshModel*>(selectedModel);
-    if(!input) throw StarlabException("Selection must be a 'SurfaceMeshModel'");
-    input->renderer()->setRenderMode("Transparent");
-
-    /// Create a copy of the model
-    QString newpath = "";
-    QString newname = QString(input->name).append(" (medial)");
-    SurfaceMeshModel* mesh = new SurfaceMeshModel(newpath,newname);
-    mesh->deep_copy(*input);
-    doc->addModel(mesh);
-    doc->setSelectedModel(mesh);
-    
-    /// Model name might contain hint whether that's the case..    
-    /// in particular make sure I don't call voronoi on an already 
-    /// medially contracted thingie.
-    // if(mesh->name)
-    
+void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, StarlabDrawArea* drawArea){
+    /// Draw the input vertices if overlay was required
+    if(pars->getBool(overlayInput)){
+        Vector3VertexProperty points = mesh->get_vertex_property<Vector3>(VPOINT);
+        foreach(Vertex v, mesh->vertices())
+            drawArea->drawPoint(points[v],1,Qt::red);
+    }
+            
+#ifdef MATLAB
     /// Compute voronoi mapping and measures
-    MatlabVoronoiHelper h(mesh, drawArea);
-    h.createVertexIndexes();
-    h.meshVerticesToVariable("points");
-    h.meshNormalsToVariable("normals");
-    h.computeVoronoiDiagramOf("points");
-    h.searchVoronoiPoles("poleof","scorr");
-    h.getMedialSpokeAngleAndRadii("Vangle","Vradii");
+    MatlabVoronoiHelper mat(mesh, drawArea);
+    mat.createVertexIndexes();
+    mat.meshVerticesToVariable("points");
+    mat.meshNormalsToVariable("normals");
+    mat.computeVoronoiDiagramOf("points");
+    mat.searchVoronoiPoles("poleof","scorr");
+    mat.getMedialSpokeAngleAndRadii("Vangle","Vradii");
     
     /// Export angle/radii from medial to surface
-    h.eval("vangle=Vangle(poleof);");
-    h.eval("vradii=Vradii(poleof);");   
-    h.variableToVertexScalarProperty("vangle","v:angle");
-    h.variableToVertexScalarProperty("vradii","v:radii");
+    mat.eval("vangle=Vangle(poleof);");
+    mat.eval("vradii=Vradii(poleof);");   
+    mat.variableToVertexScalarProperty("vangle",VANGLE);
+    mat.variableToVertexScalarProperty("vradii",VRADII);
+    mat.eval("points = loci(poleof,:);");
     
-    /// Set vertex positions to medial, leave surface untouched in debug mode
-    h.eval("points = loci(poleof,:);");
-    h.variableToMeshVertices("points");
+    /// Should we apply the transform?
+    string propname = pars->getBool(embedVertices)?VPOINT:VPOLE;
+    mat.variableToVector3VertexProperty("points",propname);
+#endif
+
+#ifdef QHULL
+    TODO THE QHULL VERSION    
+#endif
     
-    /// Mark mesh as a medial mesh
-    mesh->setProperty("MedialMesh",true);
-        
-    /// Debug visualization
-    bool executethis = false;
-    if(executethis){
+    /// Colorize one of the exposed properties
+    if( pars->getBool(colorizeRadii) || pars->getBool(colorizeAngle) ){
         mesh->renderer()->setRenderMode("Smooth");
-        // const char* prop = "v:angle";
-        const char* prop = "v:radii";
-        qDebug() << ScalarStatisticsHelper(mesh).statistics(prop);
-        ColorizeHelper(mesh,unsignedColorMap).vscalar_to_vcolor(prop);
+        string propname;
+        if( pars->getBool(colorizeRadii) ) propname = VRADII;
+        if( pars->getBool(colorizeAngle) ) propname = VANGLE;
+        ColorizeHelper(mesh,unsignedColorMap).vscalar_to_vcolor(propname);
+        // qDebug() << ScalarStatisticsHelper(mesh).statistics(propname);
     }
 }
 

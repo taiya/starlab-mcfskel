@@ -1,164 +1,48 @@
 #include "mcfskel.h"
-#include "PoleAttractorHelper.h"
 
+/// QT-stuff
 #include <QList>
 #include <QDir>
 #include <QFileDialog>
 
+/// Dictates the motion 
+#include "ContractionHelper.h"
+#include "PoleAttractorHelper.h"
+/// Dictates topology changes
 #include "TopologyJanitor.h"
+/// I/O
 #include "../starlab/plugins/surfacemesh_io_off/surfacemesh_io_helpers.h"
 
-// #define USE_POLE_ANGLE
-#ifdef USE_POLE_ANGLE
-/// [0...1] weight,
-double angle_weight(Scalar alpha, Scalar TH_ALPHA=30.0){
-    double TH_ALPHA_RAD = TH_ALPHA/180.0*3.1415;
-    double sigma2 = ( TH_ALPHA_RAD / 2.5 ) * ( TH_ALPHA_RAD / 2.5 );
-    double omega = exp( -pow(3.1415-alpha,2) / sigma2 );
-    return omega;
-}
-#endif
-
-class TopologyJanitor_ClosestPole : public TopologyJanitor{
-public:
-    TopologyJanitor_ClosestPole(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), TopologyJanitor(mesh){}
-
-    /// @{ This collapse mode retains only the closest pole greedily
-    virtual Counter collapser(Scalar edgelength_TH){
-        Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
-        Vector3VertexProperty poles = mesh->vertex_property<Vector3>("v:poles");
-#ifdef USE_POLE_ANGLE
-        ScalarVertexProperty pangle = mesh->vertex_property<Scalar>("v:pangle");
-#endif
-        /// Keep the set of poles associated with the point
-        typedef QList<Vector3> PoleList;
-        typedef Surface_mesh::Vertex_property<PoleList> VSetVertexProperty;
-        VSetVertexProperty pset = mesh->vertex_property<PoleList>("v:pset");
-
-        Counter count=0;
-        foreach(Edge e,mesh->edges()){
-            Halfedge h = mesh->halfedge(e,0);
-            if(mesh->edge_length(e)<edgelength_TH){
-                if(!mesh->is_deleted(h) && mesh->is_collapse_ok(h)){
-                    Vertex v0 = mesh->from_vertex(h);
-                    Vertex v1 = mesh->to_vertex(h);
-                    points[v1] = (points[v0]+points[v1])/2.0f;
-
-                    /// Find the closest pole
-                    Vector3 pole0 = poles[v0];
-                    Vector3 pole1 = poles[v1];
-                    Scalar d0 = (pole0 - points[v1]).norm();
-                    Scalar d1 = (pole1 - points[v1]).norm();
-
-                    /// Pick it
-                    poles[v1] = (d0<d1) ? poles[v0] : poles[v1];
-#ifdef USE_POLE_ANGLE
-                    pangle[v1] = (d0<d1) ? pangle[v0] : pangle[v1];
-#endif
-                    /// And keep track of correspondences
-                    pset[v1] += pset[v0];
-
-                    /// Perform collapse
-                    mesh->collapse(h);
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-    virtual Counter splitter(Scalar short_edge, Scalar TH_ALPHA /*110*/){
-        Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
-        Vector3VertexProperty poles  = mesh->get_vertex_property<Vector3>("v:poles");
-#ifdef USE_POLE_ANGLE
-        ScalarVertexProperty pangle = mesh->vertex_property<Scalar>("v:pangle");
-#endif
-        /// Keep track / decide which to split
-        TH_ALPHA *= (3.14/180);
-
-        /// Store halfedge opposite angles
-        ScalarHEdgeProperty halpha = cacheAngles(short_edge);
-
-        /// Splitting section
-        Scalar numsplits=0;
-        BoolVertexProperty vissplit = mesh->vertex_property<bool>("v:issplit",false);
-        foreach(Edge e, mesh->edges()){
-            Halfedge h0 = mesh->halfedge(e,0);
-            Halfedge h1 = mesh->halfedge(e,1);
-
-            /// Should a split take place?
-            Scalar alpha_0 = halpha[ h0 ];
-            Scalar alpha_1 = halpha[ h1 ];
-            if(alpha_0<TH_ALPHA || alpha_1<TH_ALPHA) continue;
-
-            /// Which side should I split?
-            Vertex w0 = mesh->to_vertex( mesh->next_halfedge(h0) );
-            Vertex w1 = mesh->to_vertex( mesh->next_halfedge(h1) );
-            Vertex wsplitside = (alpha_0>alpha_1) ? w0 : w1;
-
-            /// Project side vertex on edge
-            Point p0 = points[mesh->vertex(e,0)];
-            Point p1 = points[mesh->vertex(e,1)];
-            Vector3 projector = (p1-p0).normalized();
-            Vector3 projectee = points[wsplitside]-p0;
-            Scalar t = dot(projector, projectee);
-
-            Q_ASSERT(!isnan(t));
-            Vector3 newpos = p0 + t*projector;
-
-            /// Perform the split at the desired location
-            Vertex vnew = mesh->split(e,newpos);
-
-            /// Also project the pole
-            Vector3 pole0 = poles[mesh->vertex(e,0)];
-            Vector3 pole1 = poles[mesh->vertex(e,1)];
-            Vector3 p_projector = (pole1-pole0).normalized();
-            poles[vnew] = pole0 + t*p_projector;
-#ifdef USE_POLE_ANGLE
-            pangle[vnew] = 0; /// NO EFFECT
-#endif
-            /// And mark it as a split
-            vissplit[vnew] = true;
-            numsplits++;
-        }
-        return numsplits;
-    }
-};
-
-void mcfskel::initParameters(Document *document, RichParameterSet *parameters, StarlabDrawArea *drawArea){
-    SurfaceMeshModel* model = qobject_cast<SurfaceMeshModel*>(document->selectedModel());
-    mesh = model;
-
+void mcfskel::initParameters(SurfaceMeshModel *mesh, RichParameterSet *parameters, StarlabDrawArea */*drawArea*/){
     /// Add a transparent copy of the model
-    {
+#if 0
         SurfaceMeshModel* copy = new SurfaceMeshModel(mesh->path,"original");
         copy->read( mesh->path.toStdString() );
         document->addModel(copy);
         drawArea->initRendering();
         copy->renderer()->setRenderMode("Transparent");
-    }
+#endif
 
-    Scalar scale = 0.002*model->getBoundingBox().size().length();
+    Scalar scale = 0.002*mesh->getBoundingBox().size().length();
     parameters->addParam(new RichFloat("omega_L_0",1));
     parameters->addParam(new RichFloat("omega_H_0",20));
     parameters->addParam(new RichFloat("omega_P_0",40));
     parameters->addParam(new RichFloat("edgelength_TH",scale));
-    parameters->addParam(new RichFloat("alpha",0.15));
     parameters->addParam(new RichFloat("zero_TH",1e-10));
 }
 
-void mcfskel::algorithm(RichParameterSet* pars){
+void mcfskel::applyFilter(SurfaceMeshModel* mesh, RichParameterSet *pars, StarlabDrawArea *drawArea){
     if(firststep) mesh->renderer()->setRenderMode("Smooth");
     qDebug() << "==== Medial Contraction ===";
     qDebug() << "Step# : " << stepcount;
 
-    static PoleAttractorHelper h(mesh);
+    ContractionHelper h(mesh);
 
     Scalar omega_L_0 = pars->getFloat("omega_L_0");
     Scalar omega_H_0 = pars->getFloat("omega_H_0");
     Scalar omega_P_0 = pars->getFloat("omega_P_0");
     Scalar edgelength_TH = pars->getFloat("edgelength_TH");
     Scalar zero_TH = pars->getFloat("zero_TH");
-    Scalar alpha = pars->getFloat("alpha");
 
     /// Compute initialization
     ScalarVertexProperty varea_0    = mesh->vertex_property<Scalar>("v:area_0",1);
@@ -170,9 +54,6 @@ void mcfskel::algorithm(RichParameterSet* pars){
     BoolVertexProperty   visfixed   = mesh->vertex_property<bool>("v:isfixed",false);
     Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:poles");
     ScalarVertexProperty omega_P	= mesh->vertex_property<Scalar>("v:omega_P",0);
-#ifdef USE_POLE_ANGLE
-    ScalarVertexProperty pangle     = mesh->vertex_property<Scalar>("v:pangle");
-#endif
 
     /// Init/retrieve properties
     static MeanHelper meanArea;
@@ -191,10 +72,6 @@ void mcfskel::algorithm(RichParameterSet* pars){
         if(!success) throw StarlabException("Failed to open pole file");
         Vector3VertexProperty poles_in = polemesh.get_vertex_property<Vector3>("v:point");
         Q_ASSERT(poles_in);
-#ifdef USE_POLE_ANGLE
-        ScalarVertexProperty angle_in = polemesh.get_vertex_property<Scalar>("v:angle");
-        Q_ASSERT(angle_in);
-#endif
 
         qDebug() << "Cache v:area_0";
         varea_0 = h.computeVertexVoronoiArea("v:area_0");
@@ -204,9 +81,6 @@ void mcfskel::algorithm(RichParameterSet* pars){
 
             /// Save pole in currene mesh
             poles[v] = poles_in[v];
-#ifdef USE_POLE_ANGLE
-            pangle[v] = angle_in[v];
-#endif
             /// The initial pole set is trivial
             pset[v].push_back(poles[v]);
         }
@@ -403,6 +277,5 @@ void mcfskel::algorithm(RichParameterSet* pars){
         qDebug() << "Path changed!!";
     }
 }
-
 
 Q_EXPORT_PLUGIN(mcfskel)

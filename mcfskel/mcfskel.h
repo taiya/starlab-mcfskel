@@ -12,31 +12,23 @@
 #include "LocalAnalysisHelper.h"
 #include "SurfaceAreaHelper.h"
 
-class mcfskel : public FilterPlugin{
+class mcfskel : public SurfaceMeshFilterPlugin{
     Q_OBJECT
     Q_INTERFACES(FilterPlugin)
     
 public:
-    virtual QString name() { return "Mesh Contraction"; }
-    virtual QString description() { return "Performs Skeletonization by Collapsing Mesh Structure"; }
-    virtual QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_K); }
+    QString name() { return "Mesh Contraction"; }
+    QString description() { return "Performs Skeletonization by Collapsing Mesh Structure"; }
+    QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_K); }
     
 public:    
-    SurfaceMeshModel* mesh;
-    StarlabDrawArea* drawArea;
     bool toggle; /// TRUE 
     bool firststep;
     Counter stepcount;
     mcfskel() : toggle(true), firststep(true), stepcount(0){}
 
 public:
-    void algorithm(RichParameterSet* );
-    
-public:
-    void initParameters(Document* document, RichParameterSet* parameters, StarlabDrawArea* drawArea);
-    void applyFilter(Document* document, RichParameterSet* pars, StarlabDrawArea* drawArea)
-    {
-        algorithm(pars);
-    }
+    void initParameters(SurfaceMeshModel* /*model*/, RichParameterSet* /*parameters*/, StarlabDrawArea* /*drawArea*/);
+    void applyFilter(SurfaceMeshModel* /*mesh*/, RichParameterSet* /*parameters*/, StarlabDrawArea* /*drawArea*/);
 };
 
