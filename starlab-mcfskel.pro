@@ -10,6 +10,7 @@ SUBDIRS += surfacemesh_io_obj
 
 
 #--- OLD VERSION!!
-SUBDIRS += skelcollapse
+#SUBDIRS += skelcollapse
+
 #--- Transition version
 SUBDIRS += transition

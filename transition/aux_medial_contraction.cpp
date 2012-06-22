@@ -169,8 +169,7 @@ public:
 };
 
 void Skelcollapse::initParameters(Document *document, RichParameterSet *parameters, StarlabDrawArea *drawArea){
-    SurfaceMeshModel* model = qobject_cast<SurfaceMeshModel*>(document->selectedModel());
-    mesh = model;
+    SurfaceMeshModel* mesh = qobject_cast<SurfaceMeshModel*>(document->selectedModel());
 
     /// Add a transparent copy of the model
     {
@@ -181,7 +180,7 @@ void Skelcollapse::initParameters(Document *document, RichParameterSet *paramete
         copy->renderer()->setRenderMode("Transparent"); 
     }
         
-    Scalar scale = 0.002*model->getBoundingBox().size().length();
+    Scalar scale = 0.002*mesh->getBoundingBox().size().length();
     parameters->addParam(new RichFloat("omega_L_0",1));
     parameters->addParam(new RichFloat("omega_H_0",20));
     parameters->addParam(new RichFloat("omega_P_0",40));
@@ -191,9 +190,7 @@ void Skelcollapse::initParameters(Document *document, RichParameterSet *paramete
 }
 
 void Skelcollapse::algorithm(RichParameterSet* pars){
-    if(firststep) mesh->renderer()->setRenderMode("Smooth"); 
     qDebug() << "==== Medial Contraction ===";
-    qDebug() << "Step# : " << stepcount;
     
     static PoleAttractorHelper h(mesh);
     h.eval("lastwarn('');");
@@ -202,7 +199,6 @@ void Skelcollapse::algorithm(RichParameterSet* pars){
     Scalar omega_P_0 = pars->getFloat("omega_P_0");
     Scalar edgelength_TH = pars->getFloat("edgelength_TH");
     Scalar zero_TH = pars->getFloat("zero_TH");
-    Scalar alpha = pars->getFloat("alpha");
         
     /// Compute initialization
     ScalarVertexProperty varea_0    = mesh->vertex_property<Scalar>("v:area_0",1);
