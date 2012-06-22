@@ -10,7 +10,6 @@
 #include "StatisticsHelper.h"
 #include "DoUndoHelper.h"
 #include "LocalAnalysisHelper.h"
-#include "MatlabLaplacianHelper.h"
 #include "SurfaceAreaHelper.h"
 
 typedef QList<Surface_mesh::Vertex> VertexList;

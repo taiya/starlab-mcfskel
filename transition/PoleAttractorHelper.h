@@ -7,8 +7,6 @@ public:
     PoleAttractorHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), LaplacianHelper(mesh), MatlabMeanValueLaplacianHelper(mesh){}
     
     void createLaplacianMatrix(){
-        if(!hweight) throw MissingPropertyException("h:weight");
-        
         /// Fill memory
         Size nv = mesh->n_vertices();
         Counter nzmax = mesh->n_halfedges()+mesh->n_vertices();        
@@ -56,9 +54,49 @@ public:
         put("L", _L);
     }
     
+    void setConstraints(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L){
+        if(!omega_H || !omega_L) throw MissingPropertyException("Invalid");
+        if(!vindex)  throw MissingPropertyException("v:index");
+        
+        /// Initialize "omega_L"
+        {
+            mxArray* _w = mxCreateDoubleMatrix(mesh->n_vertices(),1,mxREAL);
+            double* w = mxGetPr(_w); 
+            foreach(Vertex v, mesh->vertices())
+                w[ vindex[v] ] = omega_L[v];
+            put("omega_L", _w);
+        }
+        
+        /// Initialize "omega_H"
+        {
+            mxArray* _w = mxCreateDoubleMatrix(mesh->n_vertices(),1,mxREAL);
+            double* w = mxGetPr(_w); 
+            foreach(Vertex v, mesh->vertices())
+                w[ vindex[v] ] = omega_H[v];
+            put("omega_H", _w);
+        }
+        
+        /// Initialize x0
+        {
+            const char* x0_property = "v:point";
+            Vector3VertexProperty points = mesh->get_vertex_property<Vector3>(x0_property);        
+            if(!points) throw MissingPropertyException(x0_property);
+            mxArray* _x0 = mxCreateDoubleMatrix(mesh->n_vertices(),3,mxREAL);
+            double* x0 = mxGetPr(_x0);
+            Index nrows = mesh->n_vertices();
+            foreach(Vertex v, mesh->vertices()){
+                // qDebug() << points[v];
+                x0[ vindex[v] + 0*nrows ] = points[v].x();
+                x0[ vindex[v] + 1*nrows ] = points[v].y();
+                x0[ vindex[v] + 2*nrows ] = points[v].z();
+            }
+            put("x0", _x0);
+        }
+    }
+    
     void setConstraints(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L, ScalarVertexProperty omega_P, Vector3VertexProperty poles){
         /// Do what was already there
-        MatlabMeanValueLaplacianHelper::setConstraints(omega_H,omega_L);
+        setConstraints(omega_H,omega_L);
         if(!omega_P) throw MissingPropertyException("Invalid");
         BoolVertexProperty vissplit = mesh->get_vertex_property<bool>("v:issplit");
         

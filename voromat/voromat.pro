@@ -7,8 +7,7 @@ CONFIG += matlab
 
 # which library to import?
 CONFIG(matlab){
-    DEFINES += MATLAB
-    include(matlab.pri)
+    STARLAB_EXTERNAL += matlab
 } else {
     DEFINES += QHULL
     error(Attempting to use QHULL)
