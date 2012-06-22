@@ -3,11 +3,41 @@
 #include <QList>
 #include <QDir>
 
-#include "surfacemesh_io_helpers.h"
 #include "LegacyLaplacianHelper.h"
 #include "PoleAttractorHelper.h"
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
+
+void updateConstraints(SurfaceMeshModel* mesh, Scalar omega_L_0, Scalar omega_H_0, Scalar omega_P_0, Scalar zero_TH){
+    SurfaceMeshHelper h(mesh);
+    ScalarVertexProperty omega_H = h.getScalarVertexProperty("v:omega_H");
+    ScalarVertexProperty omega_L = h.getScalarVertexProperty("v:omega_L");
+    ScalarVertexProperty omega_P = h.getScalarVertexProperty("v:omega_P");  
+    
+    BoolVertexProperty   vissplit = mesh->vertex_property<bool>("v:issplit",false);
+    BoolVertexProperty   visfixed = mesh->vertex_property<bool>("v:isfixed",false);
+    
+    foreach(Vertex v, mesh->vertices()){
+        /// Leave fixed points really alone
+        if(visfixed[v]){
+            omega_L[v] = 0;
+            omega_H[v] = 1.0/zero_TH;
+            omega_P[v] = 0;
+            continue;
+        }
+        
+        omega_L[v] = omega_L_0;
+        omega_H[v] = omega_H_0;
+        omega_P[v] = omega_P_0;
+
+        /// Ficticious vertices are simply relaxed
+        if(vissplit[v]){
+            omega_L[v] = omega_L_0;
+            omega_H[v] = omega_H_0;
+            omega_P[v] = 0;
+        }
+    }
+}
 
 void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, StarlabDrawArea* drawArea){
     /// Filter initialization
@@ -24,7 +54,7 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     Vector3VertexProperty points    = mesh->vertex_property<Vector3>("v:point");
     ScalarVertexProperty omega_H    = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
     ScalarVertexProperty omega_L    = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
-    ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0);
+    ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0); /// First step only smoothing
     BoolVertexProperty   vissplit   = mesh->vertex_property<bool>("v:issplit",false);
     BoolVertexProperty   visfixed   = mesh->vertex_property<bool>("v:isfixed",false);
     Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:pole");
@@ -75,29 +105,7 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
         } catch(StarlabException e){}
 
         /// Update constraints
-        {
-            ScalarVertexProperty varea = h.computeVertexVoronoiArea(VAREA);
-            foreach(Vertex v, mesh->vertices()){
-                /// Leave fixed points really alone
-                if(visfixed[v]){
-                    omega_L[v] = 0;
-                    omega_H[v] = 1.0/zero_TH;
-                    omega_P[v] = 0;
-                    continue;
-                }
-                
-                omega_L[v] = omega_L_0;
-                omega_H[v] = omega_H_0;
-                omega_P[v] = omega_P_0;
-
-                /// Ficticious vertices are simply relaxed
-                if(vissplit[v]){
-                    omega_L[v] = omega_L_0;
-                    omega_H[v] = omega_H_0;
-                    omega_P[v] = 0;
-                }
-            }
-        }
+        updateConstraints(mesh, omega_L_0, omega_H_0, omega_P_0, zero_TH);
     }    
 
     /// ----------------------------------------------------------------------------- /// 
