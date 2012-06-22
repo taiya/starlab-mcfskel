@@ -75,11 +75,6 @@ void Skelcollapse::algorithm_iteration(){
     typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
     VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
     if(!isInitialized){
-        /// Every vertex initially corresponds to itself
-        // foreach(Vertex v, mesh->vertices())
-        //  corrs[v].push_back(v);
-
-        /// LEGACY!!!!!!!!!!
         foreach(Vertex v, mesh->vertices()){
             pset[v].push_back(poles[v]);            
         }

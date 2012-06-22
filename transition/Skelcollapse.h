@@ -97,9 +97,11 @@ public:
         drawArea->deleteAllRenderObjects();
         setupFilter(document,pars,drawArea);
         
-        /// Run a single iteration (for now...)
-        algorithm_iteration();
-        
+        /// Every vertex initially corresponds to itself
+        if(!isInitialized)
+            foreach(Vertex v, mesh->vertices())
+                corrs[v].push_back(v);
+
         /// Change name and path of the file
         if(!isInitialized){
             QFileInfo fi(mesh->path);
@@ -109,7 +111,10 @@ public:
             qDebug() << "Path changed!!"; 
         }
         
-        /// Tell the mesh this is not its first iteration
+        /// Run a single iteration (for now...)
+        algorithm_iteration();
+        
+        /// Tell the model this is not its first iteration
         mesh->setProperty("isInitialized",true);
     }
 
