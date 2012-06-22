@@ -1,10 +1,16 @@
 #pragma once
-#include "MatlabLaplacianHelper.h"
+#include "SurfaceMeshHelper.h"
+#include "LegacyLaplacianHelper.h"
+#include "MatlabSurfaceMeshHelper.h"
 
 /// Augments the setContraints with poles information
-class PoleAttractorHelper : public MatlabMeanValueLaplacianHelper{
+class PoleAttractorHelper : public MeanValueLaplacianHelper, public MatlabSurfaceMeshHelper{
 public:
-    PoleAttractorHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), LaplacianHelper(mesh), MatlabMeanValueLaplacianHelper(mesh){}
+    PoleAttractorHelper(SurfaceMeshModel* mesh) : 
+        SurfaceMeshHelper(mesh), 
+        LaplacianHelper(mesh), 
+        MeanValueLaplacianHelper(mesh), 
+        MatlabSurfaceMeshHelper(mesh){}
     
     void createLaplacianMatrix(){
         /// Fill memory
