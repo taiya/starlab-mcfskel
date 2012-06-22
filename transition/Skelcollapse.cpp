@@ -21,44 +21,27 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     Scalar zero_TH = pars->getFloat("zero_TH");
         
     /// Compute initialization
-    Vector3VertexProperty points_0  = mesh->vertex_property<Vector3>("v:point_0");
     Vector3VertexProperty points    = mesh->vertex_property<Vector3>("v:point");
     ScalarVertexProperty omega_H    = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
     ScalarVertexProperty omega_L    = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
     ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0);
     BoolVertexProperty   vissplit   = mesh->vertex_property<bool>("v:issplit",false);
     BoolVertexProperty   visfixed   = mesh->vertex_property<bool>("v:isfixed",false);
-    Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:poles");
+    Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:pole");
     
+    /// LEGACY!!!!!!!!!!
+    typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
+    VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
     bool firststep = !mesh->property("ContractionInitialized").isValid();
     if(firststep){
         mesh->setProperty("ContractionInitialized",true);
         /// Every vertex initially corresponds to itself
         // foreach(Vertex v, mesh->vertices())
         //  corrs[v].push_back(v);
-    }
-    
-    /// Init/retrieve properties
-    if(firststep){
-        /// Retrieves poles from the associated mesh
-        typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
-        VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
-        SurfaceMeshModel polemesh;
-        QString basename = QFileInfo(mesh->path).baseName();
-        QString currpath = QFileInfo(mesh->path).dir().dirName();
-        QString polesfullpath = currpath+"/"+basename+"_poles.off";
-        if(!QFileInfo(polesfullpath).exists()) throw StarlabException("Cannot find poles file at: %s",qPrintable(polesfullpath) );
-        bool success = attempt_read_as_medial_mesh(polesfullpath,&polemesh);
-        if(!success) throw StarlabException("Failed to open pole file");
-        Vector3VertexProperty poles_in = polemesh.get_vertex_property<Vector3>("v:point");
-        Q_ASSERT(poles_in);
-        
+
+        /// LEGACY!!!!!!!!!!
         foreach(Vertex v, mesh->vertices()){
-            points_0[v] = points[v];
-            /// Save pole in currene mesh
-            poles[v] = poles_in[v];
-            /// The initial pole set is trivial
-            pset[v].push_back(poles[v]);
+            pset[v].push_back(poles[v]);            
         }
     }
        

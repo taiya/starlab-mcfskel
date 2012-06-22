@@ -41,6 +41,7 @@ public:
         parameters->addParam(new RichFloat("omega_P_0",40));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
         parameters->addParam(new RichFloat("zero_TH",1e-10));
+        
         parameters->addParam(new RichBool("performContraction",true));
         parameters->addParam(new RichBool("medialContraction",false));
         /// Harder to do...

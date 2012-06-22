@@ -26,9 +26,10 @@ HEADERS += \
     SurfaceAreaHelper.h \
     MatlabLaplacianHelper.h \
     LegacyLaplacianHelper.h \
-    aux_medial_contraction.cpp \
     TopologyJanitor.h \
     TopologyJanitor_ClosestPole.h \
+    MatlabContractionHelper.h \
+    ContractionHelper.h \
     PoleAttractorHelper.h
 
 SOURCES += \
