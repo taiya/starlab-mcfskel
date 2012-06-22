@@ -3,6 +3,12 @@
 
 class TopologyJanitor : public virtual SurfaceMeshHelper{
 public:
+    /// Used to store surface correspondences, note you will not be able to use it to 
+    /// access the evolving mesh.. these Vertex indexes are w.r.t the ORIGINAL mesh!!
+    typedef QList<Surface_mesh::Vertex> VertexList;
+    typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;  
+    
+public:
     TopologyJanitor(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh){}
     QString cleanup(Scalar short_edge, Scalar edgelength_TH, Scalar alpha){
         Size nv_prev = mesh->n_vertices();
@@ -12,10 +18,11 @@ public:
         retval.sprintf("Topology update: #V %d ==> %d [ #Collapses: %d, #Splits: %d]",nv_prev,mesh->n_vertices(),numCollapses, numSplits);
         return retval;
     }
+    
 protected:
-    virtual ScalarHEdgeProperty cacheAngles(Scalar short_edge){
+    virtual ScalarHalfedgeProperty cacheAngles(Scalar short_edge){
         /// Store halfedge opposite angles
-        ScalarHEdgeProperty halpha = mesh->halfedge_property<Scalar>("h:alpha",0);
+        ScalarHalfedgeProperty halpha = mesh->halfedge_property<Scalar>("h:alpha",0);
         foreach(Face f,mesh->faces()){
             Halfedge h_a = mesh->halfedge(f);
             Halfedge h_b = mesh->next_halfedge(h_a);
@@ -87,7 +94,7 @@ protected:
         TH_ALPHA *= (3.14/180);
     
         /// Compute halpha
-        ScalarHEdgeProperty halpha = cacheAngles(short_edge);        
+        ScalarHalfedgeProperty halpha = cacheAngles(short_edge);        
         
         /// Splitting section
         BoolVertexProperty visfixed = mesh->get_vertex_property<bool>("v:isfixed");
@@ -165,13 +172,9 @@ public:
     virtual Counter collapser(Scalar edgelength_TH){
         Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
         Vector3VertexProperty poles = mesh->vertex_property<Vector3>("v:poles");
-
-        /// Keep the set of poles associated with the point
-        typedef QList<Vector3> PoleList;
-        typedef Surface_mesh::Vertex_property<PoleList> VSetVertexProperty;
-        VSetVertexProperty pset = mesh->vertex_property<PoleList>("v:pset");
-
-        Counter count=0;
+        VertexListVertexProperty corrs = mesh->vertex_property<VertexList>("v:corrs");
+        
+        Counter count = 0;
         foreach(Edge e,mesh->edges()){
             Halfedge h = mesh->halfedge(e,0);
             if(mesh->edge_length(e)<edgelength_TH){
@@ -190,7 +193,7 @@ public:
                     poles[v1] = (d0<d1) ? poles[v0] : poles[v1];
 
                     /// And keep track of correspondences
-                    pset[v1] += pset[v0];
+                    corrs[v1] += corrs[v0];
 
                     /// Perform collapse
                     mesh->collapse(h);
@@ -207,7 +210,7 @@ public:
         TH_ALPHA *= (3.14/180);
 
         /// Store halfedge opposite angles
-        ScalarHEdgeProperty halpha = cacheAngles(short_edge);
+        ScalarHalfedgeProperty halpha = cacheAngles(short_edge);
 
         /// Splitting section
         Scalar numsplits=0;

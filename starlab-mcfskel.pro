@@ -7,3 +7,9 @@ SUBDIRS += remesher
 SUBDIRS += voromat
 SUBDIRS += mcfskel
 SUBDIRS += surfacemesh_io_obj
+
+
+#--- OLD VERSION!!
+SUBDIRS += skelcollapse
+#--- Transition version
+SUBDIRS += transition

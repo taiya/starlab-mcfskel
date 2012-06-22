@@ -205,7 +205,7 @@ public:
     }
               
     void createLaplacianMatrix(){
-        if(!eweight) throw MissingPropertyException("e:weight");
+        if(!hweight) throw MissingPropertyException("h:weight");
         
         /// Fill memory
         Size nv = mesh->n_vertices();
@@ -229,13 +229,13 @@ public:
             /// in the diagonal elements directly...
             Scalar diagel=0;
             foreach(Halfedge h, mesh->onering_hedges(v))
-                diagel+=eweight[mesh->edge(h)];
+                diagel+=hweight[h];
             indices.push_back(Key(vindex[v],-diagel));
             
             /// Off-diagonal entries            
             foreach(Halfedge h, mesh->onering_hedges(v)){
                 Index vi = vindex[mesh->to_vertex(h)];
-                indices.push_back(Key(vi,eweight[mesh->edge(h)]));
+                indices.push_back(Key(vi,hweight[h]));
             }
             
             /// Sort them in order

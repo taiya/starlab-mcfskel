@@ -66,7 +66,7 @@ Model* surfacemesh_io_obj::open(QString path){
     }    
     
     /// post-process checks
-    if(vertexCounter != mVertexCounter)
+    if(medialDataAllocated && (vertexCounter != mVertexCounter))
         throw StarlabException("#Poles != #Vertices");
     
     return mesh;

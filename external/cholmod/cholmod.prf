@@ -1,0 +1,12 @@
+#---------- CHOLMOD ----------
+INCLUDEPATH += $$PWD/include
+win32{
+    # static library (Windows)
+    LIBS += -L$$PWD/win32/lib 
+    LIBS += -llibcholmod -llibgoto_CHOLMOD -llibmetis_CHOLMOD -llibamd -llibcamd -llibcolamd -llibccolamd
+}
+mac{
+    LIBS += -L$$PWD/lib/darwin11
+    # LIBS += -lcholmod -lamd -lcamd -lcolamd -lccolamd
+    LIBS += -lamd -lcamd -lccolamd -lcholmod -lcolamd -lcxsparse -lblas
+}
