@@ -27,7 +27,9 @@ HEADERS += \
     MatlabLaplacianHelper.h \
     LegacyLaplacianHelper.h \
     aux_medial_contraction.cpp \
-    TopologyJanitor.h
+    TopologyJanitor.h \
+    TopologyJanitor_ClosestPole.h \
+    PoleAttractorHelper.h
 
 SOURCES += \
     Skelcollapse.cpp
