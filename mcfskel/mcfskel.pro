@@ -1,20 +1,27 @@
-CONFIG += starlab 
+CONFIG += starlab
 STARLAB_TEMPLATE += plugin 
 STARLAB_DEPENDS += surfacemesh_model
-STARLAB_EXTERNAL += eigen-3.1.0-rc1
 
-# Load the external solver
-load($$PWD/../external/cholmod/cholmod.prf)
-OTHER_FILES += $$PWD/../external/cholmod/cholmod.prf
+DEPENDPATH  *= $$PWD
+INCLUDEPATH *= $$PWD
 
-include(matlab.pri)
+#--- What solver would you like to use?
+#CONFIG += matlab 
+CONFIG += cholmod
 
-HEADERS += mcfskel.h \
-    TopologyJanitor.h \
-    ContractionHelper.h \
+# which library to import?
+CONFIG(matlab):     STARLAB_EXTERNAL += matlab
+CONFIG(cholmod):    STARLAB_EXTERNAL += cholmod eigen
+
+HEADERS += \
+    Skelcollapse.h \
     SurfaceAreaHelper.h \
-    MatlabLaplacianHelper.h \
-    PoleAttractorHelper.h \
-    LegacyTopologyJanitor.h
+    TopologyJanitor.h \
+    TopologyJanitor_ClosestPole.h \
+    MatlabContractionHelper.h \
+    EigenContractionHelper.h
 
-SOURCES += mcfskel.cpp
+SOURCES += \
+    Skelcollapse.cpp
+
+
