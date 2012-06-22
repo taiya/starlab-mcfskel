@@ -13,6 +13,9 @@
 #include "MatlabLaplacianHelper.h"
 #include "SurfaceAreaHelper.h"
 
+typedef QList<Surface_mesh::Vertex> VertexList;
+typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;
+
 class Skelcollapse : public FilterPlugin{
     Q_OBJECT
     Q_INTERFACES(FilterPlugin)
@@ -32,6 +35,7 @@ private:
     /// @} 
         
     /// @{ algorithm internal data
+        VertexListVertexProperty corrs;            
         SurfaceMeshModel*     mesh;
         StarlabDrawArea*      drawArea;
         Vector3VertexProperty points;
@@ -67,21 +71,26 @@ public:
         this->mesh     = qobject_cast<SurfaceMeshModel*>( document->selectedModel() );
         this->drawArea = drawArea;
                 
-        /// Filter initialization
-        SurfaceMeshHelper helper(mesh);
-        omega_L_0     = pars->getFloat("omega_L_0"); 
-        omega_H_0     = pars->getFloat("omega_H_0");
-        omega_P_0     = pars->getFloat("omega_P_0");
-        edgelength_TH = pars->getFloat("edgelength_TH");
-        zero_TH       = pars->getFloat("zero_TH");
-        points        = helper.getVector3VertexProperty(VPOINT);
-        poles         = helper.getVector3VertexProperty("v:pole");
-        omega_H       = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
-        omega_L       = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
-        omega_P       = mesh->vertex_property<Scalar>("v:omega_P",0); /// First step only smoothing
-        vissplit      = mesh->vertex_property<bool>("v:issplit",false);
-        visfixed      = mesh->vertex_property<bool>("v:isfixed",false);
-        isInitialized = mesh->property("isInitialized").toBool();
+        { /// Retrieve parameters
+            omega_L_0     = pars->getFloat("omega_L_0"); 
+            omega_H_0     = pars->getFloat("omega_H_0");
+            omega_P_0     = pars->getFloat("omega_P_0");
+            edgelength_TH = pars->getFloat("edgelength_TH");
+            zero_TH       = pars->getFloat("zero_TH");
+        }
+        
+        { /// Retrieve properties
+            SurfaceMeshHelper helper(mesh);
+            points        = helper.getVector3VertexProperty(VPOINT);
+            poles         = helper.getVector3VertexProperty("v:pole");
+            omega_H       = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
+            omega_L       = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
+            omega_P       = mesh->vertex_property<Scalar>("v:omega_P",0); /// First step only smoothing
+            vissplit      = mesh->vertex_property<bool>("v:issplit",false);
+            visfixed      = mesh->vertex_property<bool>("v:isfixed",false);
+            isInitialized = mesh->property("isInitialized").toBool();
+            corrs         = mesh->vertex_property<VertexList>("v:corrs");
+        }
     }
 
     void applyFilter(Document* document, RichParameterSet* pars, StarlabDrawArea* drawArea){

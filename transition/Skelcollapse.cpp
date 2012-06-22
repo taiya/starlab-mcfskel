@@ -65,8 +65,8 @@ void Skelcollapse::detectDegeneracies(){
     }
 }
 void Skelcollapse::updateTopology(){
-    // qDebug() << TopologyJanitor(mesh).cleanup(1e-10,edgelength_TH,110);
-    // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(1e-10,edgelength_TH,110);
+    // qDebug() << TopologyJanitor(mesh).cleanup(zero_TH,edgelength_TH,110);
+    // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(zero_TH,edgelength_TH,110);
     qDebug() << TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
 }
 
@@ -74,9 +74,7 @@ void Skelcollapse::algorithm_iteration(){
     /// LEGACY!!!!!!!!!!
     typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
     VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
-    bool firststep = !mesh->property("ContractionInitialized").isValid();
-    if(firststep){
-        mesh->setProperty("ContractionInitialized",true);
+    if(!isInitialized){
         /// Every vertex initially corresponds to itself
         // foreach(Vertex v, mesh->vertices())
         //  corrs[v].push_back(v);
