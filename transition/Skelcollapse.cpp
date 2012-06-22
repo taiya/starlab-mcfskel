@@ -14,8 +14,6 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     SurfaceMeshModel* mesh = qobject_cast<SurfaceMeshModel*>( document->selectedModel() );
     drawArea->deleteAllRenderObjects();
     
-    static PoleAttractorHelper h(mesh);
-    h.eval("lastwarn('');");
     Scalar omega_L_0 = pars->getFloat("omega_L_0"); 
     Scalar omega_H_0 = pars->getFloat("omega_H_0");
     Scalar omega_P_0 = pars->getFloat("omega_P_0");
@@ -23,15 +21,14 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     Scalar zero_TH = pars->getFloat("zero_TH");
         
     /// Compute initialization
-    ScalarVertexProperty varea_0    = mesh->vertex_property<Scalar>("v:area_0",1);
     Vector3VertexProperty points_0  = mesh->vertex_property<Vector3>("v:point_0");
     Vector3VertexProperty points    = mesh->vertex_property<Vector3>("v:point");
     ScalarVertexProperty omega_H    = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
     ScalarVertexProperty omega_L    = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
+    ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0);
     BoolVertexProperty   vissplit   = mesh->vertex_property<bool>("v:issplit",false);
     BoolVertexProperty   visfixed   = mesh->vertex_property<bool>("v:isfixed",false);
     Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:poles");
-    ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0);
     
     bool firststep = !mesh->property("ContractionInitialized").isValid();
     if(firststep){
@@ -42,7 +39,6 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     }
     
     /// Init/retrieve properties
-    static MeanHelper meanArea;
     if(firststep){
         /// Retrieves poles from the associated mesh
         typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
@@ -57,12 +53,8 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
         Vector3VertexProperty poles_in = polemesh.get_vertex_property<Vector3>("v:point");
         Q_ASSERT(poles_in);
         
-        qDebug() << "Cache v:area_0";
-        varea_0 = h.computeVertexVoronoiArea("v:area_0");
         foreach(Vertex v, mesh->vertices()){
-            meanArea.push(varea_0[v]);
             points_0[v] = points[v];
-
             /// Save pole in currene mesh
             poles[v] = poles_in[v];
             /// The initial pole set is trivial
@@ -76,6 +68,9 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
     /// 
     /// ----------------------------------------------------------------------------- /// 
     if(true){
+        static PoleAttractorHelper h(mesh);
+        h.eval("lastwarn('');");       
+        
         if(firststep){
             foreach(Vertex v, mesh->vertices()){
                 omega_L[v] = omega_L_0;
