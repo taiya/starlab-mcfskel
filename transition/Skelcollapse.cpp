@@ -1,13 +1,30 @@
 #include "Skelcollapse.h"
-
-#include <QList>
-#include <QDir>
-
 #include "LegacyLaplacianHelper.h"
 #include "PoleAttractorHelper.h"
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
 
+void Skelcollapse::algorithm_iteration(){  
+    contractGeometry();
+    updateConstraints();
+    updateTopology();
+    detectDegeneracies();
+}
+
+void Skelcollapse::contractGeometry(){
+    static PoleAttractorHelper h(mesh);
+    h.eval("lastwarn('');");       
+                       
+    /// Update laplacian
+    h.createVertexIndexes();
+    h.computeMeanValueHalfEdgeWeights(zero_TH);
+    h.createLaplacianMatrix();
+
+    /// Set constraints and solve
+    h.setConstraints(omega_H,omega_L,omega_P,poles);
+    h.solve();
+    h.extractSolution(VPOINT);
+}
 void Skelcollapse::updateConstraints(){
     SurfaceMeshHelper h(mesh);
     foreach(Vertex v, mesh->vertices()){
@@ -30,20 +47,6 @@ void Skelcollapse::updateConstraints(){
             omega_P[v] = 0;
         }
     }
-}
-void Skelcollapse::contractGeometry(){
-    static PoleAttractorHelper h(mesh);
-    h.eval("lastwarn('');");       
-                       
-    /// Update laplacian
-    h.createVertexIndexes();
-    h.computeMeanValueHalfEdgeWeights(zero_TH);
-    h.createLaplacianMatrix();
-
-    /// Set constraints and solve
-    h.setConstraints(omega_H,omega_L,omega_P,poles);
-    h.solve();
-    h.extractSolution(VPOINT);
 }
 void Skelcollapse::detectDegeneracies(){
     Scalar elength_fixed = edgelength_TH/10.0;
@@ -68,22 +71,6 @@ void Skelcollapse::updateTopology(){
     // qDebug() << TopologyJanitor(mesh).cleanup(zero_TH,edgelength_TH,110);
     // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(zero_TH,edgelength_TH,110);
     qDebug() << TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
-}
-
-void Skelcollapse::algorithm_iteration(){  
-    /// LEGACY!!!!!!!!!!
-    typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
-    VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
-    if(!isInitialized){
-        foreach(Vertex v, mesh->vertices()){
-            pset[v].push_back(poles[v]);            
-        }
-    }
-       
-    contractGeometry();
-    updateConstraints();
-    updateTopology();
-    detectDegeneracies();
 }
 
 Q_EXPORT_PLUGIN(Skelcollapse)

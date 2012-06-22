@@ -1,5 +1,6 @@
 #pragma once
 #include "TopologyJanitor.h"
+#include "Skelcollapse.h"
 
 class TopologyJanitor_ClosestPole : public TopologyJanitor{
 public:
@@ -10,10 +11,9 @@ public:
         Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
         Vector3VertexProperty poles = mesh->vertex_property<Vector3>("v:poles");
 
-        /// Keep the set of poles associated with the point
-        typedef QList<Vector3> PoleList;
-        typedef Surface_mesh::Vertex_property<PoleList> VSetVertexProperty;
-        VSetVertexProperty pset = mesh->vertex_property<PoleList>("v:pset");
+        /// Retrieve memory to store correspondences (must be already initialized)
+        VertexListVertexProperty corrs = mesh->vertex_property<VertexList>("v:corrs");
+        if(!corrs) throw MissingPropertyException("v:corrs");
         
         Counter count=0;
         foreach(Edge e,mesh->edges()){
@@ -34,7 +34,7 @@ public:
                     poles[v1] = (d0<d1) ? poles[v0] : poles[v1];
 
                     /// And keep track of correspondences
-                    pset[v1] += pset[v0];
+                    /// @todo CORRS
                     
                     /// Perform collapse
                     mesh->collapse(h);
