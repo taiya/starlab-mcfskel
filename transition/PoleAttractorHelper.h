@@ -98,4 +98,17 @@ public:
         eval("x = LHS \\ RHS;");
         check_for_warnings();
     }
+    
+    void extractSolution(const string property){
+        Vector3VertexProperty solution = mesh->get_vertex_property<Vector3>(property); 
+        mxArray* _x = get("x");
+        if(_x == NULL) throw StarlabException("matlab solver failure");
+        double* x = mxGetPr(_x);
+        Index nrows = mesh->n_vertices();
+        foreach(Vertex v, mesh->vertices()){
+            solution[v].x() = x[vindex[v] + nrows*0];
+            solution[v].y() = x[vindex[v] + nrows*1];
+            solution[v].z() = x[vindex[v] + nrows*2];
+        }
+    }
 }; 

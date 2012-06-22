@@ -28,7 +28,6 @@ HEADERS += \
     LegacyLaplacianHelper.h \
     TopologyJanitor.h \
     TopologyJanitor_ClosestPole.h \
-    MatlabContractionHelper.h \
     ContractionHelper.h \
     PoleAttractorHelper.h
 
