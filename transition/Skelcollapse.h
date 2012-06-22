@@ -18,8 +18,9 @@ class Skelcollapse : public FilterPlugin{
     Q_INTERFACES(FilterPlugin)
     
 public:
-    virtual QString name() { return "Mesh Contraction (SUBMISSION)"; }
+    virtual QString name() { return "Mesh Contraction (Modding)"; }
     virtual QString description() { return "Performs Skeletonization by Collapsing Mesh Structure"; }
+    virtual QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_L); }
     
 public:    
     SurfaceMeshModel* mesh;
