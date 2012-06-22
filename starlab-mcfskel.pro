@@ -5,7 +5,7 @@ CONFIG += ordered
 SUBDIRS += remesher
 # SUBDIRS += voromat_qhull
 SUBDIRS += voromat
-#SUBDIRS += mcfskel
+SUBDIRS += mcfskel
 SUBDIRS += surfacemesh_io_obj
 
 

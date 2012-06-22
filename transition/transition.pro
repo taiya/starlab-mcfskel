@@ -7,19 +7,19 @@ INCLUDEPATH *= $$PWD
 
 #--- What solver would you like to use?
 CONFIG += matlab 
-# CONFIG += eigen
+#CONFIG += cholmod
 
 # which library to import?
-CONFIG(matlab): STARLAB_EXTERNAL += matlab
-CONFIG(eigen):  STARLAB_EXTERNAL += taucs eigen
+CONFIG(matlab):     STARLAB_EXTERNAL += matlab
+CONFIG(cholmod):    STARLAB_EXTERNAL += cholmod eigen
 
 HEADERS += \
     Skelcollapse.h \
     SurfaceAreaHelper.h \
     TopologyJanitor.h \
     TopologyJanitor_ClosestPole.h \
-    ContractionHelper.h \
-    MatlabContractionHelper.h
+    MatlabContractionHelper.h \
+    EigenContractionHelper.h
 
 SOURCES += \
     Skelcollapse.cpp
