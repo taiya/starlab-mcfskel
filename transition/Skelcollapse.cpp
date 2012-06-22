@@ -8,15 +8,8 @@
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
 
-void updateConstraints(SurfaceMeshModel* mesh, Scalar omega_L_0, Scalar omega_H_0, Scalar omega_P_0, Scalar zero_TH){
+void Skelcollapse::updateConstraints(){
     SurfaceMeshHelper h(mesh);
-    ScalarVertexProperty omega_H = h.getScalarVertexProperty("v:omega_H");
-    ScalarVertexProperty omega_L = h.getScalarVertexProperty("v:omega_L");
-    ScalarVertexProperty omega_P = h.getScalarVertexProperty("v:omega_P");  
-    
-    BoolVertexProperty   vissplit = mesh->vertex_property<bool>("v:issplit",false);
-    BoolVertexProperty   visfixed = mesh->vertex_property<bool>("v:isfixed",false);
-    
     foreach(Vertex v, mesh->vertices()){
         /// Leave fixed points really alone
         if(visfixed[v]){
@@ -38,91 +31,21 @@ void updateConstraints(SurfaceMeshModel* mesh, Scalar omega_L_0, Scalar omega_H_
         }
     }
 }
+void Skelcollapse::contractGeometry(){
+    static PoleAttractorHelper h(mesh);
+    h.eval("lastwarn('');");       
+                       
+    /// Update laplacian
+    h.createVertexIndexes();
+    h.computeMeanValueHalfEdgeWeights(zero_TH);
+    h.createLaplacianMatrix();
 
-void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, StarlabDrawArea* drawArea){
-    /// Filter initialization
-    SurfaceMeshModel* mesh = qobject_cast<SurfaceMeshModel*>( document->selectedModel() );
-    drawArea->deleteAllRenderObjects();
-    
-    Scalar omega_L_0 = pars->getFloat("omega_L_0"); 
-    Scalar omega_H_0 = pars->getFloat("omega_H_0");
-    Scalar omega_P_0 = pars->getFloat("omega_P_0");
-    Scalar edgelength_TH = pars->getFloat("edgelength_TH");
-    Scalar zero_TH = pars->getFloat("zero_TH");
-        
-    /// Compute initialization
-    Vector3VertexProperty points    = mesh->vertex_property<Vector3>("v:point");
-    ScalarVertexProperty omega_H    = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
-    ScalarVertexProperty omega_L    = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
-    ScalarVertexProperty omega_P = mesh->vertex_property<Scalar>("v:omega_P",0); /// First step only smoothing
-    BoolVertexProperty   vissplit   = mesh->vertex_property<bool>("v:issplit",false);
-    BoolVertexProperty   visfixed   = mesh->vertex_property<bool>("v:isfixed",false);
-    Vector3VertexProperty poles     = mesh->vertex_property<Vector3>("v:pole");
-    
-    /// LEGACY!!!!!!!!!!
-    typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
-    VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
-    bool firststep = !mesh->property("ContractionInitialized").isValid();
-    if(firststep){
-        mesh->setProperty("ContractionInitialized",true);
-        /// Every vertex initially corresponds to itself
-        // foreach(Vertex v, mesh->vertices())
-        //  corrs[v].push_back(v);
-
-        /// LEGACY!!!!!!!!!!
-        foreach(Vertex v, mesh->vertices()){
-            pset[v].push_back(poles[v]);            
-        }
-    }
-       
-    /// ----------------------------------------------------------------------------- /// 
-    /// 
-    ///                               Solver section
-    /// 
-    /// ----------------------------------------------------------------------------- /// 
-    if(true){
-        static PoleAttractorHelper h(mesh);
-        h.eval("lastwarn('');");       
-        
-        if(firststep){
-            foreach(Vertex v, mesh->vertices()){
-                omega_L[v] = omega_L_0;
-                omega_H[v] = omega_H_0;
-                omega_P[v] = omega_P_0;
-            }
-        }
-                    
-        /// Update laplacian
-        h.createVertexIndexes();
-        h.computeMeanValueHalfEdgeWeights(zero_TH);
-        h.createLaplacianMatrix();
-
-        /// Set constraints and solve
-        h.setConstraints(omega_H,omega_L,omega_P,poles);
-        try{
-            h.solve();
-            h.extractSolution(VPOINT);
-        } catch(StarlabException e){}
-
-        /// Update constraints
-        updateConstraints(mesh, omega_L_0, omega_H_0, omega_P_0, zero_TH);
-    }    
-
-    /// ----------------------------------------------------------------------------- /// 
-    /// 
-    ///                         Topology management section
-    /// 
-    /// ----------------------------------------------------------------------------- /// 
-    // qDebug() << TopologyJanitor(mesh).cleanup(1e-10,edgelength_TH,110);
-    // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(1e-10,edgelength_TH,110);
-    qDebug() << TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
-    
-    
-    /// ----------------------------------------------------------------------------- /// 
-    /// 
-    ///                                 VERTEX FIXER
-    /// 
-    /// ----------------------------------------------------------------------------- /// 
+    /// Set constraints and solve
+    h.setConstraints(omega_H,omega_L,omega_P,poles);
+    h.solve();
+    h.extractSolution(VPOINT);
+}
+void Skelcollapse::detectDegeneracies(){
     Scalar elength_fixed = edgelength_TH/10.0;
     foreach(Vertex v, mesh->vertices()){
         if( visfixed[v] ){
@@ -140,15 +63,34 @@ void Skelcollapse::applyFilter(Document* document, RichParameterSet* pars, Starl
         visfixed[v] = willbefixed;
         if(willbefixed) drawArea->drawPoint(points[v],3,Qt::red);        
     }
+}
+void Skelcollapse::updateTopology(){
+    // qDebug() << TopologyJanitor(mesh).cleanup(1e-10,edgelength_TH,110);
+    // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(1e-10,edgelength_TH,110);
+    qDebug() << TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
+}
 
-    /// Change name and path of the file
+void Skelcollapse::algorithm_iteration(){  
+    /// LEGACY!!!!!!!!!!
+    typedef Surface_mesh::Vertex_property< QList<Vector3> > VSetVertexProperty;
+    VSetVertexProperty pset = mesh->vertex_property< QList<Vector3> >("v:pset");
+    bool firststep = !mesh->property("ContractionInitialized").isValid();
     if(firststep){
-        QFileInfo fi(mesh->path);
-        QString basename = fi.baseName();
-        QString currpath = fi.dir().path();
-        mesh->path = currpath+"/"+basename+"_ckel.off";
-        qDebug() << "Path changed!!"; 
+        mesh->setProperty("ContractionInitialized",true);
+        /// Every vertex initially corresponds to itself
+        // foreach(Vertex v, mesh->vertices())
+        //  corrs[v].push_back(v);
+
+        /// LEGACY!!!!!!!!!!
+        foreach(Vertex v, mesh->vertices()){
+            pset[v].push_back(poles[v]);            
+        }
     }
+       
+    contractGeometry();
+    updateConstraints();
+    updateTopology();
+    detectDegeneracies();
 }
 
 Q_EXPORT_PLUGIN(Skelcollapse)
