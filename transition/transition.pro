@@ -9,7 +9,6 @@ INCLUDEPATH *= $$PWD
 HEADERS += \
     Skelcollapse.h \
     SurfaceAreaHelper.h \
-    LegacyLaplacianHelper.h \
     TopologyJanitor.h \
     TopologyJanitor_ClosestPole.h \
     ContractionHelper.h \

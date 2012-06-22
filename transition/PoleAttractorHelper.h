@@ -1,6 +1,5 @@
 #pragma once
 #include "SurfaceMeshHelper.h"
-//#include "LegacyLaplacianHelper.h"
 #include "LaplacianHelper.h"
 #include "MatlabSurfaceMeshHelper.h"
 
