@@ -4,13 +4,7 @@
 #include <QDir>
 #include "interfaces/SurfaceMeshModelPlugins.h"
 #include "StarlabDrawArea.h"
-#include "ColorizeHelper.h"
-#include "CurvatureEstimationHelper.h"
-#include "LegacyLaplacianHelper.h"
-#include "StatisticsHelper.h"
-#include "DoUndoHelper.h"
-#include "LocalAnalysisHelper.h"
-#include "SurfaceAreaHelper.h"
+#include "SurfaceMeshHelper.h"
 
 typedef QList<Surface_mesh::Vertex> VertexList;
 typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;

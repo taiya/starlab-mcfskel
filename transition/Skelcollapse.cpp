@@ -1,5 +1,4 @@
 #include "Skelcollapse.h"
-#include "LegacyLaplacianHelper.h"
 #include "PoleAttractorHelper.h"
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
@@ -16,7 +15,7 @@ void Skelcollapse::contractGeometry(){
                        
     /// Update laplacian
     h.createVertexIndexes();
-    h.computeMeanValueHalfEdgeWeights(zero_TH);
+    h.computeEdgeWeights(zero_TH);
     h.createLaplacianMatrix();
 
     /// Set constraints and solve

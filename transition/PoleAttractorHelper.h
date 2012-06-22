@@ -1,6 +1,7 @@
 #pragma once
 #include "SurfaceMeshHelper.h"
-#include "LegacyLaplacianHelper.h"
+//#include "LegacyLaplacianHelper.h"
+#include "LaplacianHelper.h"
 #include "MatlabSurfaceMeshHelper.h"
 
 /// Augments the setContraints with poles information

@@ -42,7 +42,7 @@ protected:
 public:
     MeanValueLaplacianHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), LaplacianHelper(mesh){}
     
-    void computeMeanValueHalfEdgeWeights(Scalar edgelength_eps=0.0, char* property="h:weight"){
+    void computeEdgeWeights(Scalar edgelength_eps=0.0, char* property="h:weight"){
         hweight = mesh->add_halfedge_property<Scalar>(property);
         
         /// Compute mean value weight on halfedges
