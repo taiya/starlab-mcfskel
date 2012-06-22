@@ -13,7 +13,6 @@ void Skelcollapse::algorithm_iteration(){
 
 void Skelcollapse::contractGeometry(){
     static PoleAttractorHelper h(mesh);
-    h.eval("lastwarn('');");       
                        
     /// Update laplacian
     h.createVertexIndexes();

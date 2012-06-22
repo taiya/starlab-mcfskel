@@ -7,56 +7,6 @@ class MatlabMeanValueLaplacianHelper : public MeanValueLaplacianHelper, public M
 public:
     MatlabMeanValueLaplacianHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), LaplacianHelper(mesh), MeanValueLaplacianHelper(mesh), MatlabSurfaceMeshHelper(mesh){}
 
-    void createLaplacianMatrix(){
-        if(!hweight) throw MissingPropertyException("h:weight");
-        
-        /// Fill memory
-        Size nv = mesh->n_vertices();
-        Counter nzmax = mesh->n_halfedges()+mesh->n_vertices();        
-        mxArray* _L = mxCreateSparse(nv, nv, nzmax, mxREAL);
-        double*  sr  = mxGetPr(_L);
-        mwIndex* irs = mxGetIr(_L);
-        mwIndex* jcs = mxGetJc(_L);
-        
-        /// Fill sparse matrix in order
-        int k=0; /// Tot number elements
-        int j=0; /// Column index
-        typedef std::pair<Index,Scalar> Key;        
-        foreach(Vertex v, mesh->vertices()){
-            jcs[j] = k;
-
-            /// Sort off elements (including diagonal)
-            QVector<Key> indices;
-
-            /// If cotangent then it's symmetric and we can fill
-            /// in the diagonal elements directly...
-            Scalar diagel=0;
-            foreach(Halfedge h, mesh->onering_hedges(v))
-                diagel+=hweight[h];
-            indices.push_back(Key(vindex[v],-diagel));
-            
-            /// Only off-diagonal elements are inserted!!
-            foreach(Halfedge h, mesh->onering_hedges(v)){
-                Index vi = vindex[mesh->to_vertex(h)];
-                indices.push_back(Key(vi,hweight[h]));
-            }
-            
-            /// Sort them in order
-            std::sort(indices.begin(), indices.end());
-            
-            /// Insert them in the sparse matrix
-            foreach(Key key,indices){
-                // qDebug() << key.first << key.second;
-                sr[k] = key.second;
-                irs[k] = key.first;
-                k++;
-            }
-            j++;
-        }
-        jcs[mesh->n_vertices()] = k;      
-        put("L", _L);
-    }
-    
     void setConstraints(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L){
         if(!omega_H || !omega_L) throw MissingPropertyException("Invalid");
         if(!vindex)  throw MissingPropertyException("v:index");
