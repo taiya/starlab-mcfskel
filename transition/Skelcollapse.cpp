@@ -1,7 +1,9 @@
 #include "Skelcollapse.h"
-#include "PoleAttractorHelper.h"
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
+
+#include "MatlabContractionHelper.h"
+//#include "EigenContractionHelper.h"
 
 void Skelcollapse::algorithm_iteration(){  
     contractGeometry();
@@ -11,17 +13,15 @@ void Skelcollapse::algorithm_iteration(){
 }
 
 void Skelcollapse::contractGeometry(){
-    static PoleAttractorHelper h(mesh);
-                       
-    /// Update laplacian
-    h.createVertexIndexes();
-    h.computeEdgeWeights(zero_TH);
-    h.createLaplacianMatrix();
-
-    /// Set constraints and solve
-    h.setConstraints(omega_H,omega_L,omega_P,poles);
-    h.solve();
-    h.extractSolution(VPOINT);
+#ifdef MATLAB
+    static MatlabContractionHelper mch(mesh);
+    mch.evolve(omega_H,omega_L,omega_P,poles,zero_TH);         
+#endif
+    
+#ifdef TAUCS
+    
+    
+#endif
 }
 void Skelcollapse::updateConstraints(){
     SurfaceMeshHelper h(mesh);

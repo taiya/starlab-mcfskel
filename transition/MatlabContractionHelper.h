@@ -1,17 +1,31 @@
 #pragma once
+
+#ifdef MATLAB
+
 #include "SurfaceMeshHelper.h"
 #include "LaplacianHelper.h"
 #include "MatlabSurfaceMeshHelper.h"
 
 /// Augments the setContraints with poles information
-class PoleAttractorHelper : public MeanValueLaplacianHelper, public MatlabSurfaceMeshHelper{
+class MatlabContractionHelper : public MeanValueLaplacianHelper, public MatlabSurfaceMeshHelper{
 public:
-    PoleAttractorHelper(SurfaceMeshModel* mesh) : 
+    MatlabContractionHelper(SurfaceMeshModel* mesh) : 
         SurfaceMeshHelper(mesh), 
         LaplacianHelper(mesh), 
         MeanValueLaplacianHelper(mesh), 
         MatlabSurfaceMeshHelper(mesh){}
-    
+    void evolve(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L, ScalarVertexProperty omega_P, Vector3VertexProperty poles, Scalar zero_TH){
+        /// Update laplacian
+        createVertexIndexes();
+        computeEdgeWeights(zero_TH);
+        createLaplacianMatrix();
+        /// Set constraints and solve
+        setConstraints(omega_H,omega_L,omega_P,poles);
+        solve();
+        extractSolution(VPOINT);     
+    }
+
+private:    
     void createLaplacianMatrix(){
         /// Fill memory
         Size nv = mesh->n_vertices();
@@ -156,3 +170,5 @@ public:
         }
     }
 }; 
+
+#endif
