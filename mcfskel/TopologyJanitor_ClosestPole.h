@@ -8,8 +8,7 @@ public:
        
     /// @{ This collapse mode retains only the closest pole greedily
     virtual Counter collapser(Scalar edgelength_TH){
-        Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
-        Vector3VertexProperty poles = mesh->vertex_property<Vector3>("v:poles");
+        Vector3VertexProperty poles = mesh->get_vertex_property<Vector3>("v:pole");
 
         /// Retrieve memory to store correspondences (must be already initialized)
         VertexListVertexProperty corrs = mesh->vertex_property<VertexList>("v:corrs");
@@ -45,8 +44,7 @@ public:
         return count;
     }
     virtual Counter splitter(Scalar short_edge, Scalar TH_ALPHA /*110*/){
-        Vector3VertexProperty points = mesh->get_vertex_property<Point>("v:point");
-        Vector3VertexProperty poles  = mesh->get_vertex_property<Vector3>("v:poles");
+        Vector3VertexProperty poles  = mesh->get_vertex_property<Vector3>("v:pole");
 
         /// Keep track / decide which to split    
         TH_ALPHA *= (3.14/180);

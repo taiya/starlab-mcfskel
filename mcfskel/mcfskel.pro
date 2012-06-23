@@ -1,12 +1,17 @@
 CONFIG += starlab
 STARLAB_TEMPLATE += plugin 
 STARLAB_DEPENDS += surfacemesh_model
-STARLAB_EXTERNAL += matlab cholmod eigen
+STARLAB_EXTERNAL += cholmod eigen
+
+# Uncomment to use matlab as a solver instead of eigen
+# CONFIG += matlab 
+CONFIG(matlab){
+    DEFINES += USE_MATLAB
+    STARLAB_EXTERNAL += matlab 
+}
 
 DEPENDPATH += $$PWD
-#DEFINES += USE_MATLAB
 
-#--- What solver would you like to use?
 HEADERS += \
     Skelcollapse.h \
     TopologyJanitor.h \
@@ -14,9 +19,11 @@ HEADERS += \
     MatlabContractionHelper.h \
     EigenContractionHelper.h \
     CotangentLaplacianHelper.h \
-    MeanValueLaplacianHelper.h
+    MeanValueLaplacianHelper.h \
+    Logfile.h
 
 SOURCES += \  
-    Skelcollapse.cpp
+    Skelcollapse.cpp \
+    Logfile.cpp
 
 

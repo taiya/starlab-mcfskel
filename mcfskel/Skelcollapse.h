@@ -5,6 +5,7 @@
 #include "interfaces/SurfaceMeshModelPlugins.h"
 #include "StarlabDrawArea.h"
 #include "SurfaceMeshHelper.h"
+#include "Logfile.h"
 
 typedef QList<Surface_mesh::Vertex> VertexList;
 typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;
@@ -54,7 +55,7 @@ public:
         Scalar scale = 0.002*mesh->getBoundingBox().size().length();
         parameters->addParam(new RichFloat("omega_L_0",1));
         parameters->addParam(new RichFloat("omega_H_0",use_matlab?20:0.1));
-        parameters->addParam(new RichFloat("omega_P_0",use_matlab?40:0.0));
+        parameters->addParam(new RichFloat("omega_P_0",use_matlab?40:0.2));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
         parameters->addParam(new RichFloat("alpha",0.15));
         parameters->addParam(new RichFloat("zero_TH",1e-10));
@@ -85,7 +86,7 @@ public:
             poles         = helper.getVector3VertexProperty("v:pole");
             omega_H       = mesh->vertex_property<Scalar>("v:omega_H",omega_H_0);
             omega_L       = mesh->vertex_property<Scalar>("v:omega_L",omega_L_0);
-            omega_P       = mesh->vertex_property<Scalar>("v:omega_P",0); /// First step only smoothing
+            omega_P       = mesh->vertex_property<Scalar>("v:omega_P",omega_P_0);
             vissplit      = mesh->vertex_property<bool>("v:issplit",false);
             visfixed      = mesh->vertex_property<bool>("v:isfixed",false);
             isInitialized = mesh->property("isInitialized").toBool();
@@ -97,18 +98,19 @@ public:
         drawArea->deleteAllRenderObjects();
         setupFilter(document,pars,drawArea);
         
-        /// Every vertex initially corresponds to itself
-        if(!isInitialized)
+        if(!isInitialized){
+            /// Setup LOG file
+            tictocreset("log.txt");
+
+            /// Every vertex initially corresponds to itself
             foreach(Vertex v, mesh->vertices())
                 corrs[v].push_back(v);
-
-        /// Change name and path of the file
-        if(!isInitialized){
+        
+            /// Change name/path of the model
             QFileInfo fi(mesh->path);
             QString basename = fi.baseName();
             QString currpath = fi.dir().path();
             mesh->path = currpath+"/"+basename+"_ckel.off";
-            qDebug() << "Path changed!!"; 
         }
         
         /// Run a single iteration (for now...)
@@ -118,9 +120,22 @@ public:
         mesh->setProperty("isInitialized",true);
     }
 
+    void algorithm_iteration(){  
+        logme("----------- ITERATION ----------");
+        tic("Geometry Contraction"); contractGeometry();   toc();
+        tic("Constraints Update");   updateConstraints();  toc();
+        tic("Update Topology");      updateTopology();     toc();        
+        tic("Detect Degeneracies");  detectDegeneracies(); toc();
+
+        /// Highlight fixed vertices
+        foreach(Vertex v, mesh->vertices()){
+            if( visfixed[v] )
+                drawArea->drawPoint(points[v],3,Qt::red);        
+        }    
+    }
+    
     void updateConstraints();
     void contractGeometry();
-    void algorithm_iteration();
     void detectDegeneracies();
     void updateTopology();
 };

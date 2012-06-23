@@ -2,15 +2,11 @@
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
 
-#include "MatlabContractionHelper.h"
-#include "EigenContractionHelper.h"
-
-void Skelcollapse::algorithm_iteration(){  
-    contractGeometry();
-    updateConstraints();
-    updateTopology();
-    detectDegeneracies();
-}
+#ifdef USE_MATLAB
+    #include "MatlabContractionHelper.h"
+#else
+    #include "EigenContractionHelper.h"
+#endif
 
 void Skelcollapse::contractGeometry(){
 #ifdef USE_MATLAB
@@ -43,13 +39,13 @@ void Skelcollapse::updateConstraints(){
         }
     }
 }
+
 void Skelcollapse::detectDegeneracies(){
     Scalar elength_fixed = edgelength_TH/10.0;
     foreach(Vertex v, mesh->vertices()){
-        if( visfixed[v] ){
-            drawArea->drawPoint(points[v],3,Qt::red);        
-            continue;
-        }
+        /// previously fixed remain so
+        if(visfixed[v]) continue;
+
         bool willbefixed = false;
         Counter badcounter=0;        
         foreach(Halfedge h, mesh->onering_hedges(v)){
@@ -58,14 +54,13 @@ void Skelcollapse::detectDegeneracies(){
                 badcounter++;
         }        
         willbefixed = (badcounter>=2);
-        visfixed[v] = willbefixed;
-        if(willbefixed) drawArea->drawPoint(points[v],3,Qt::red);        
+        visfixed[v] = willbefixed;  
     }
 }
 void Skelcollapse::updateTopology(){
-    // qDebug() << TopologyJanitor(mesh).cleanup(zero_TH,edgelength_TH,110);
-    // qDebug() << TopologyJanitor_MergePoleSet(mesh).cleanup(zero_TH,edgelength_TH,110);
-    qDebug() << TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
+    // QString message = TopologyJanitor(mesh).cleanup(zero_TH,edgelength_TH,110);
+    QString message = TopologyJanitor_ClosestPole(mesh).cleanup(zero_TH,edgelength_TH,110);
+    qDebug() << message;
 }
 
 Q_EXPORT_PLUGIN(Skelcollapse)
