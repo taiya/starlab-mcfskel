@@ -9,13 +9,20 @@
 typedef QList<Surface_mesh::Vertex> VertexList;
 typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;
 
+#ifdef USE_MATLAB
+    const bool use_matlab = true;
+#else
+    const bool use_matlab = false;
+#endif
+
+
 class Skelcollapse : public FilterPlugin{
     Q_OBJECT
     Q_INTERFACES(FilterPlugin)
     
 public:
     virtual QString name() { return "MCF Skeletonization"; }
-    virtual QString description() { return "Performs Skeletonization by Collapsing Mesh Structure"; }
+    virtual QString description() { return "Performs Skeletonization by controlled Mean Curvature Flow"; }
     virtual QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_L); }
     
 private:
@@ -46,12 +53,12 @@ public:
         SurfaceMeshModel* mesh = qobject_cast<SurfaceMeshModel*>(document->selectedModel());
         Scalar scale = 0.002*mesh->getBoundingBox().size().length();
         parameters->addParam(new RichFloat("omega_L_0",1));
-        parameters->addParam(new RichFloat("omega_H_0",20));
-        parameters->addParam(new RichFloat("omega_P_0",40));
+        parameters->addParam(new RichFloat("omega_H_0",use_matlab?20:0.1));
+        parameters->addParam(new RichFloat("omega_P_0",use_matlab?40:0.0));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
         parameters->addParam(new RichFloat("alpha",0.15));
         parameters->addParam(new RichFloat("zero_TH",1e-10));
-                
+        
         /// Add a transparent copy of the model, must be done only when the parameter window
         /// is open (a.k.a. on first iteration)
         SurfaceMeshModel* copy = new SurfaceMeshModel(mesh->path,"original");

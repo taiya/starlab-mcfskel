@@ -1,24 +1,23 @@
 #pragma once
 
-#ifdef MATLAB
-
 #include "SurfaceMeshHelper.h"
-#include "LaplacianHelper.h"
 #include "MatlabSurfaceMeshHelper.h"
+#include "MeanValueLaplacianHelper.h"
 
 /// Augments the setContraints with poles information
-class MatlabContractionHelper : public MeanValueLaplacianHelper, public MatlabSurfaceMeshHelper{
-public:
-    MatlabContractionHelper(SurfaceMeshModel* mesh) : 
-        SurfaceMeshHelper(mesh), 
-        LaplacianHelper(mesh), 
-        MeanValueLaplacianHelper(mesh), 
-        MatlabSurfaceMeshHelper(mesh){}
+class MatlabContractionHelper : public SurfaceMeshHelper{
+private:
+    IndexVertexProperty vindex;
+    MatlabSurfaceMeshHelper matlab;
+    
+public: 
+    MatlabContractionHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh),matlab(mesh){}
     void evolve(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L, ScalarVertexProperty omega_P, Vector3VertexProperty poles, Scalar zero_TH){
+        ScalarHalfedgeProperty hweight = MeanValueLaplacianHelper(mesh).computeMeanValueHalfEdgeWeights(zero_TH,"h:weight");
+         
         /// Update laplacian
-        createVertexIndexes();
-        computeEdgeWeights(zero_TH);
-        createLaplacianMatrix();
+        vindex = matlab.createVertexIndexes();
+        createLaplacianMatrix(hweight);
         /// Set constraints and solve
         setConstraints(omega_H,omega_L,omega_P,poles);
         solve();
@@ -26,7 +25,7 @@ public:
     }
 
 private:    
-    void createLaplacianMatrix(){
+    void createLaplacianMatrix(ScalarHalfedgeProperty hweight){
         /// Fill memory
         Size nv = mesh->n_vertices();
         Counter nzmax = mesh->n_halfedges()+mesh->n_vertices();        
@@ -71,7 +70,7 @@ private:
             j++;
         }
         jcs[mesh->n_vertices()] = k;      
-        put("L", _L);
+        matlab.put("L", _L);
     }
     
     void setConstraints(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L){
@@ -84,7 +83,7 @@ private:
             double* w = mxGetPr(_w); 
             foreach(Vertex v, mesh->vertices())
                 w[ vindex[v] ] = omega_L[v];
-            put("omega_L", _w);
+            matlab.put("omega_L", _w);
         }
         
         /// Initialize "omega_H"
@@ -93,7 +92,7 @@ private:
             double* w = mxGetPr(_w); 
             foreach(Vertex v, mesh->vertices())
                 w[ vindex[v] ] = omega_H[v];
-            put("omega_H", _w);
+            matlab.put("omega_H", _w);
         }
         
         /// Initialize x0
@@ -110,7 +109,7 @@ private:
                 x0[ vindex[v] + 1*nrows ] = points[v].y();
                 x0[ vindex[v] + 2*nrows ] = points[v].z();
             }
-            put("x0", _x0);
+            matlab.put("x0", _x0);
         }
     }
     
@@ -126,7 +125,7 @@ private:
             double* w = mxGetPr(_w); 
             foreach(Vertex v, mesh->vertices())
                 w[ vindex[v] ] = omega_P[v];
-            put("omega_P", _w);            
+            matlab.put("omega_P", _w);            
         }
         
         /// Initialize p0 (poles positions)
@@ -140,26 +139,26 @@ private:
                 p0[ vindex[v] + 1*nrows ] = poles[v].y();
                 p0[ vindex[v] + 2*nrows ] = poles[v].z();
             }
-            put("p0", _p0);
+            matlab.put("p0", _p0);
         }
     }
     void solve(){
-        // eval("save('/Users/ata2/Developer/skelcollapse/poles.mat')");        
-        eval("lastwarn('');");       
-        eval("nv = size(L,1);");
-        eval("OMEGA_L = spdiags(omega_L,0,nv,nv);");
-        eval("L = OMEGA_L * L';");
-        eval("H = spdiags(omega_H, 0, nv, nv);");
-        eval("P = spdiags(omega_P, 0, nv, nv);");
-        eval("LHS = [L; H; P];");
-        eval("RHS = [ zeros(nv,3) ; H*x0 ; P*p0];");
-        eval("x = LHS \\ RHS;");
-        check_for_warnings();
+        // matlab.eval("save('/Users/ata2/Developer/skelcollapse/poles.mat')");        
+        matlab.eval("lastwarn('');");       
+        matlab.eval("nv = size(L,1);");
+        matlab.eval("OMEGA_L = spdiags(omega_L,0,nv,nv);");
+        matlab.eval("L = OMEGA_L * L';");
+        matlab.eval("H = spdiags(omega_H, 0, nv, nv);");
+        matlab.eval("P = spdiags(omega_P, 0, nv, nv);");
+        matlab.eval("LHS = [L; H; P];");
+        matlab.eval("RHS = [ zeros(nv,3) ; H*x0 ; P*p0];");
+        matlab.eval("x = LHS \\ RHS;");
+        matlab.check_for_warnings();
     }
     
     void extractSolution(const string property){
         Vector3VertexProperty solution = mesh->get_vertex_property<Vector3>(property); 
-        mxArray* _x = get("x");
+        mxArray* _x = matlab.get("x");
         if(_x == NULL) throw StarlabException("matlab solver failure");
         double* x = mxGetPr(_x);
         Index nrows = mesh->n_vertices();
@@ -170,5 +169,3 @@ private:
         }
     }
 }; 
-
-#endif

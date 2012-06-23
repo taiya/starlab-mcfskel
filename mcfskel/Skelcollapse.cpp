@@ -2,12 +2,8 @@
 #include "TopologyJanitor.h"
 #include "TopologyJanitor_ClosestPole.h"
 
-#ifdef MATLAB
-    #include "MatlabContractionHelper.h"
-#endif
-#ifdef CHOLMOD
-    #include "EigenContractionHelper.h"
-#endif
+#include "MatlabContractionHelper.h"
+#include "EigenContractionHelper.h"
 
 void Skelcollapse::algorithm_iteration(){  
     contractGeometry();
@@ -17,17 +13,13 @@ void Skelcollapse::algorithm_iteration(){
 }
 
 void Skelcollapse::contractGeometry(){
-#ifdef MATLAB
-    /// @todo can we move the matlab helper as an inner class and make THAT static?
-    static MatlabContractionHelper mch(mesh);
-    mch.evolve(omega_H,omega_L,omega_P,poles,zero_TH);   
-#endif
-    
-#ifdef CHOLMOD
-    EigenContractionHelper ech(mesh);
-    ech.evolve(omega_H,omega_L,omega_P,poles,zero_TH);
+#ifdef USE_MATLAB
+    MatlabContractionHelper(mesh).evolve(omega_H,omega_L,omega_P,poles,zero_TH);   
+#else
+    EigenContractionHelper(mesh).evolve(omega_H,omega_L,omega_P,poles);
 #endif
 }
+
 void Skelcollapse::updateConstraints(){
     SurfaceMeshHelper h(mesh);
     foreach(Vertex v, mesh->vertices()){

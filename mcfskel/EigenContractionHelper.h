@@ -5,12 +5,13 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #include <Eigen/CholmodSupport>
-#include "LaplacianHelper.h"
 #include "SurfaceMeshHelper.h"
+
+#include "CotangentLaplacianHelper.h"
 
 using namespace Eigen;
 
-class EigenContractionHelper : public MeanValueLaplacianHelper{ 
+class EigenContractionHelper : public SurfaceMeshHelper{ 
 private:
     int nrows, ncols;
     IndexVertexProperty vindex;   
@@ -19,10 +20,10 @@ private:
     MatrixXd X;
 
 public:
-    EigenContractionHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh), LaplacianHelper(mesh), MeanValueLaplacianHelper(mesh){}
-    void evolve(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L, ScalarVertexProperty /*omega_P*/, Vector3VertexProperty /*poles*/, Scalar zero_TH){
-        computeEdgeWeights(zero_TH);
-
+    EigenContractionHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh){}
+    void evolve(ScalarVertexProperty omega_H, ScalarVertexProperty omega_L, ScalarVertexProperty /*omega_P*/, Vector3VertexProperty /*poles*/){
+        ScalarHalfedgeProperty hweight = CotangentLaplacianHelper(mesh).computeCotangentEdgeWeights("h:weight");
+        
         updateVertexIndexes();
         createLHS(hweight,omega_L,omega_H);
         createRHS(omega_H,points);
@@ -132,8 +133,5 @@ void EigenContractionHelper::solve_linear_least_square(SparseMatrix<double> & A,
     tsolve = timer.elapsed()/1000.0;
     
     /// Outputs times to stdoutput
-    cout << "[CHOLMOD Linear Solver] Size: " 
-         << AtA.cols() 
-         << " Factorization(s): " << setprecision(3) << tfact 
-         << " 3xSolve(s): " << setprecision(3) << tsolve << endl;    
+    printf("[CHOLMOD Linear Solver] Size: %d \tFactorization: %.3f \t3xSolves: %.3f\n",AtA.cols(),tfact,tsolve);
 }
