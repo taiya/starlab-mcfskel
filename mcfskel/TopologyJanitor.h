@@ -1,6 +1,12 @@
 #pragma once
 #include "SurfaceMeshHelper.h"
 
+#ifdef WIN32
+#define NAN std::numeric_limits<Scalar>::signaling_NaN()
+#define isnan(x) _isnan(x)
+#define isinf(x) (!_finite(x))
+#endif
+
 class TopologyJanitor : public virtual SurfaceMeshHelper{
 public:
     TopologyJanitor(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh){}
