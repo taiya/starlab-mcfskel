@@ -6,7 +6,8 @@ SUBDIRS += remesher
 SUBDIRS += voromat
 SUBDIRS += mcfskel
 SUBDIRS += surfacemesh_io_obj
- 
+SUBDIRS += skeleton_compare 
+
 #--- DISABLED
 # SUBDIRS += skelcollapse
 # SUBDIRS += voromat_qhull
