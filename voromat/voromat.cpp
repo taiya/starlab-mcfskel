@@ -2,6 +2,7 @@
 #include "MatlabVoronoiHelper.h"
 #include "StatisticsHelper.h"
 #include "ColorizeHelper.h"
+#include <QElapsedTimer>
 
 void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, StarlabDrawArea* drawArea){
     /// Draw the input vertices if overlay was required
@@ -10,10 +11,12 @@ void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, Starla
         foreach(Vertex v, mesh->vertices())
             drawArea->drawPoint(points[v],1,Qt::red);
     }
+    QElapsedTimer timer;
             
 #ifdef MATLAB
     /// Compute voronoi mapping and measures
     MatlabVoronoiHelper mat(mesh, drawArea);
+    timer.start(); // Don't count matlab startup in timing
     mat.createVertexIndexes();
     mat.meshVerticesToVariable("points");
     mat.meshNormalsToVariable("normals");
@@ -34,9 +37,12 @@ void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, Starla
 #endif
 
 #ifdef QHULL
+    timer.start();
     TODO THE QHULL VERSION    
 #endif
-    
+
+    qDebug() << "[VOROMAT]" << timer.elapsed() << "ms";
+            
     /// Colorize one of the exposed properties
     if( pars->getBool(colorizeRadii) || pars->getBool(colorizeAngle) ){
         mesh->renderer()->setRenderMode("Smooth");
