@@ -138,7 +138,7 @@ void surfacemesh_filter_to_skeleton::applyFilter(Document* document, RichParamet
 	}
 
 	/// now, delete the items that have been marked to be deleted
-    //skel->garbage_collection();
+    skel->garbage_collection();
 	skel->print_stats();
 }
 
