@@ -91,25 +91,6 @@ private:
 
 	void drawCell(std::vector<uint> cell)
 	{
-		/*std::vector<Vector3> cell_points;
-		foreach(uint loci_id, cell)	
-			cell_points.push_back(loci[loci_id]);
-		if(!cell_points.size()) return;
-
-		Qhull cell_hull("", 3, cell_points.size(), &cell_points.front().x(), "Qg Qt");
-
-		foreach(QhullFacet f, cell_hull.facetList())
-		{
-			std::vector<Vector3> cell_face;
-
-			foreach(QhullVertex v, f.vertices()){
-				QhullPoint qhpnt = v.point();
-				cell_face.push_back(Vector3 (qhpnt[0], qhpnt[1], qhpnt[2]));
-			}
-
-			drawArea->drawTriangle(cell_face[0],cell_face[1],cell_face[2]);
-		}*/
-
 		foreach(uint loci_id, cell) drawArea->drawPoint(loci[loci_id], 5);
 	}
 
@@ -245,18 +226,26 @@ public:
 		}
 	}
 
-	void setToMedial()
-	{
+    void setToMedial(bool isEmbed)
+    {
 		foreach(Vertex v, mesh->vertices())
 		{
 			int pole = poleof[v.idx()];
 
-			// Set vertex positions to medial
-			points[v] = loci[pole];
+            // Set vertex positions to medial
+            if(isEmbed)
+                points[v] = loci[pole];
 
 			// Export angle/radii from medial to surface
 			vangle[v] = alpha[pole];
 			vradii[v] = radii[pole];
 		}
+
+        if(!isEmbed){
+            Vector3VertexProperty vpoles = mesh->add_vertex_property<Vector3>("v:pole");
+
+            foreach(Vertex v, mesh->vertices())
+                vpoles[v] = loci[ poleof[v.idx()] ];
+        }
 	}
 };
