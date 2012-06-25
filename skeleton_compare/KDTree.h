@@ -214,7 +214,7 @@ int KDTree::build_recursively(vector< vector<int> >& sorter, vector<char>& sideh
     int nR = numel-nL;
     
     // Assign l/r sides
-    for(int i=0; i<sorter[dim].size(); i++){
+    for(int i=0; i<(int)sorter[dim].size(); i++){
         int pidx = sorter[dim][i];
         sidehelper[ pidx ] = (i<=iMedian) ? 'l':'r';
     }
@@ -225,7 +225,7 @@ int KDTree::build_recursively(vector< vector<int> >& sorter, vector<char>& sideh
 
     for(int idim=0; idim<ndims(); idim++){
         int iL=0, iR=0;
-        for(int i=0; i<sorter[idim].size(); i++){
+        for(int i=0; i<(int)sorter[idim].size(); i++){
             int pidx = sorter[idim][i];
             if(sidehelper[pidx]=='l')
                 Lsorter[idim][iL++] = pidx;
@@ -260,9 +260,8 @@ int KDTree::build_recursively(vector< vector<int> >& sorter, vector<char>& sideh
  */
 void KDTree::linear_tree_print() const{
     for (unsigned int i=0; i < nodesPtrs.size(); i++) {
-        Node* n = nodesPtrs[i];
-
 #ifdef MATLAB
+        Node* n = nodesPtrs[i];
         if(n==NULL) mexErrMsgTxt("%d-th node is NULL.");
         if(n->isLeaf())
             mexPrintf("Node[%d] P[%d]\n",i,n->pIdx);

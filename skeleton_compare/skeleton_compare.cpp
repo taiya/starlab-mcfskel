@@ -1,7 +1,10 @@
 #include "skeleton_compare.h"
+
+#include <QMessageBox>
 #include "SkeletonModel.h"
 #include "SkeletonHelper.h"
 #include "KDTree.h"
+#include "StarlabDrawArea.h"
 
 std::vector<double> toKDPoint(const SkeletonTypes::Point & from){
     std::vector<double> p(3, 0.0);
@@ -9,73 +12,46 @@ std::vector<double> toKDPoint(const SkeletonTypes::Point & from){
     return p;
 }
 
-void skeleton_compare::initParameters(Document *, RichParameterSet* /*pars*/, StarlabDrawArea *){}
-
-void skeleton_compare::applyFilter(Document* document, RichParameterSet* params, StarlabDrawArea* drawArea)
-{
-    QList<SkeletonModel*> skeletons;
-
-    // Extract list of all skeleton models
-    foreach(Model * m, document->models)
-    {
-        SkeletonModel* currSkel = qobject_cast<SkeletonModel*>(m);
-        if(!currSkel) continue;
-        skeletons.push_back(currSkel);
-    }
-
-    if(skeletons.size() < 2){
-        qDebug() << "Warning: nothing to compare.";
-        return;
-    }
-
-    SkeletonModel * src = skeletons.front();
-    std::vector<Point> src_points;
+void skeleton_compare::applyFilter(Document* document, RichParameterSet* params, StarlabDrawArea* drawArea){
+    drawArea->deleteAllRenderObjects();
+    
+    bool show_measurements = params->getBool("Show measurements");
+    
+    SkeletonModel* src = document->getModel<SkeletonModel>(params->getString("Target Skeleton"));
+    SkeletonModel* target = qobject_cast<SkeletonModel*>( document->selectedModel() );
+    if(!target) throw StarlabException("Must be a skeleton model");
+    
     SkeletonModel::Vertex_property<SkeletonTypes::Point> src_pnts = src->vertex_property<SkeletonTypes::Point>("v:point");
+    SkeletonModel::Vertex_property<SkeletonTypes::Point> target_pnts = target->vertex_property<SkeletonTypes::Point>("v:point");
+    
+    // Construct a kd-tree
+    std::vector<Point> src_points;
     foreach(SkeletonTypes::Vertex v, src->vertices())
         src_points.push_back( toKDPoint(src_pnts[v]) );
-
-    // KD Tree
     KDTree src_tree(src_points);
 
-    // Average differences
-    std::vector<double> avg_difference (skeletons.size() - 1, 0.0);
-
     // Common variables
-    int closeidx = -1, skel_idx = 0;;
+    int closeidx = -1;
     double di = 0.0;
 
-    // For each skeleton loaded
-    foreach(SkeletonModel * target, skeletons)
+    // Compare target points
+    double avgDifference=0.0;
     {
-        if(src == target) continue;
-
-        double sumDifference = 0.0;
-
-        // Compare target points
-        SkeletonModel::Vertex_property<SkeletonTypes::Point> target_pnts = target->vertex_property<SkeletonTypes::Point>("v:point");
-        foreach(SkeletonTypes::Vertex v, target->vertices())
-        {
+        foreach(SkeletonTypes::Vertex v, target->vertices()){
             // Locate closest point, return distance
             src_tree.closest_point( toKDPoint( target_pnts[v] ), closeidx, di);
-            sumDifference += di;
+            avgDifference += di;
+            
+            if(show_measurements)
+                drawArea->drawSegment( target_pnts[v], src_pnts[ SkeletonTypes::Vertex(closeidx) ], 2, Qt::blue);            
         }
-
-        // Average the sum
-        avg_difference[skel_idx++] = sumDifference / target->n_vertices();
+        avgDifference /= target->n_vertices();
+        double bbox_diag = src->getBoundingBox().size().length();
+        avgDifference /= bbox_diag;
     }
 
-    // TODO:
-    double bbox_diag = 1.0;
-
-    // Print stats:
-    qDebug() << "Skeletons in list (" << skeletons.size() << ")";
-    qDebug() << "Comparing against " << src->name;
-
-    for(int i = 0; i < (int)avg_difference.size(); i++)
-    {
-        double d = avg_difference[i] / bbox_diag;
-        qDebug() << "Difference with ( " << skeletons[i+1]->name << " ) = " << d;
-    }
+    /// @todo use dialog of sorts..
+    qDebug() <<"One sided distance (bbox-norm)" << target->name << "=> " << src->name << avgDifference; 
 }
 
 Q_EXPORT_PLUGIN(skeleton_compare)

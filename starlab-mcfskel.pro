@@ -2,10 +2,11 @@ system(qmake -set QMAKEFEATURES $$PWD/starlab)
 TEMPLATE = subdirs
 CONFIG += ordered
 
-SUBDIRS += remesher
-SUBDIRS += voromat
-SUBDIRS += mcfskel
-SUBDIRS += surfacemesh_io_obj
+#SUBDIRS += remesher
+#SUBDIRS += voromat
+#SUBDIRS += mcfskel
+#SUBDIRS += surfacemesh_io_obj
+SUBDIRS += skeleton_resample  
 SUBDIRS += skeleton_compare 
 
 #--- DISABLED
