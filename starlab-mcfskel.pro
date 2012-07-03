@@ -2,7 +2,7 @@ system(qmake -set QMAKEFEATURES $$PWD/starlab)
 TEMPLATE = subdirs
 CONFIG += ordered
 
-#SUBDIRS += remesher
+SUBDIRS += remesher
 SUBDIRS += voromat
 SUBDIRS += mcfskel
 SUBDIRS += short_ecollapse
