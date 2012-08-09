@@ -14,5 +14,7 @@ CONFIG(matlab){
 }
 
 HEADERS += voromat.h \
-    MatlabVoronoiHelper.h
+    MatlabVoronoiHelper.h \
+    VoronoiHelper.h
+
 SOURCES += voromat.cpp
