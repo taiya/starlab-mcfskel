@@ -30,7 +30,7 @@ void skeleton_resample::applyFilter(Model* model,RichParameterSet* pars, Starlab
     double bboxnorm_avg = avg/bbox_diag;
     
     qDebug() << skel->name << "resampled to average edge length:" << avg << ", w.r.t. bbox: " << bboxnorm_avg;
-    //skel->garbage_collection(); // NOT IMPLEMENTED YET!
+    skel->garbage_collection();
 }
 
 void skeleton_resample::recursiveSplitEdge(SkeletonModel::Edge e, double threshold)

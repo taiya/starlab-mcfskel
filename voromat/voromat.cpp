@@ -1,8 +1,15 @@
 #include "voromat.h"
-#include "MatlabVoronoiHelper.h"
 #include "StatisticsHelper.h"
 #include "ColorizeHelper.h"
 #include <QElapsedTimer>
+
+#ifdef MATLAB
+#include "MatlabVoronoiHelper.h"
+#endif
+
+#ifdef QHULL
+#include "VoronoiHelper.h"
+#endif
 
 void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, StarlabDrawArea* drawArea){
     /// Draw the input vertices if overlay was required
@@ -37,8 +44,15 @@ void voromat::applyFilter(SurfaceMeshModel* mesh, RichParameterSet* pars, Starla
 #endif
 
 #ifdef QHULL
+    bool isEmbed = pars->getBool(embedVertices);
+
     timer.start();
-    TODO THE QHULL VERSION    
+
+    VoronoiHelper h(mesh, drawArea);
+    h.computeVoronoiDiagram();
+    h.searchVoronoiPoles();
+    h.getMedialSpokeAngleAndRadii();
+    h.setToMedial(isEmbed);
 #endif
 
     qDebug() << "[VOROMAT]" << timer.elapsed() << "ms";

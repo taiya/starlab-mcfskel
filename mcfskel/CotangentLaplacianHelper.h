@@ -37,7 +37,7 @@ protected:
         Point p1 = points[v1];
         
         if(mesh->is_boundary(h0) || mesh->is_boundary(h1))
-            throw StarlabException("Not supported here!!!");
+            throw StarlabException("Not supported here!!! (mesh with boundary? try to clean with MeshFix, an external program)");
             
         if (!mesh->is_boundary(h0))
         {

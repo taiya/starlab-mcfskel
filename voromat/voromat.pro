@@ -3,14 +3,14 @@ STARLAB_TEMPLATE += plugin
 STARLAB_DEPENDS += surfacemesh_model
 
 # COMMENT OUT FOR QHULL
-CONFIG += matlab 
+#CONFIG += matlab
 
 # which library to import?
 CONFIG(matlab){
     STARLAB_EXTERNAL += matlab
 } else {
     DEFINES += QHULL
-    error(Attempting to use QHULL)
+    STARLAB_EXTERNAL += qhull
 }
 
 HEADERS += voromat.h \
