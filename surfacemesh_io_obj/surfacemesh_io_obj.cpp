@@ -12,7 +12,6 @@ Model* surfacemesh_io_obj::open(QString path){
     int vertexCounter = 0;
     int faceCounter = 0;
     
-    checkValidPath(path);
     SurfaceMeshModel* mesh = new SurfaceMeshModel(path);
     
     // open file (in ASCII mode)
@@ -72,7 +71,7 @@ Model* surfacemesh_io_obj::open(QString path){
     return mesh;
 }
 
-void surfacemesh_io_obj::save(QString filename, SurfaceMeshModel *mesh){
+void surfacemesh_io_obj::save(SurfaceMeshModel *mesh, QString filename){
     FILE* out = fopen(qPrintable(filename), "w");
     if (!out) throw StarlabException("Cannot open file");
 

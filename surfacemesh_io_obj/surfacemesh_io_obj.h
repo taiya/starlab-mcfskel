@@ -1,5 +1,5 @@
 #pragma once
-#include "interfaces/SurfaceMeshModelPlugins.h"
+#include "SurfaceMeshPlugins.h"
 
 class surfacemesh_io_obj : public SurfaceMeshInputOutputPlugin{
     Q_OBJECT
@@ -7,6 +7,6 @@ class surfacemesh_io_obj : public SurfaceMeshInputOutputPlugin{
 
 public:
     QString name() { return "[MCFSkel] Wavefront Object (*.obj)"; }
-    void save(QString path, SurfaceMeshModel* mesh);
+    void save(SurfaceMeshModel* mesh, QString path);
     Model* open(QString path);
 };
