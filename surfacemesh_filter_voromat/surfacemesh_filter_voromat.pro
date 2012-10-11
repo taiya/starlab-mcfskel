@@ -1,6 +1,6 @@
 CONFIG += starlab 
 STARLAB_TEMPLATE += plugin 
-STARLAB_DEPENDS += ../starlab.surfacemesh/surfacemesh
+STARLAB_DEPENDS += ../surfacemesh/surfacemesh
 
 # COMMENT OUT FOR QHULL
 #CONFIG += matlab

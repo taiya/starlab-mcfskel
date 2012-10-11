@@ -1,6 +1,6 @@
-[submodule "starlab.core"]
-	path = starlab.core
+[submodule "starlab-core"]
+	path = starlab-core
 	url = https://code.google.com/p/starlab.core/
-[submodule "starlab.surfacemesh"]
-	path = starlab.surfacemesh
+[submodule "surfacemesh"]
+	path = surfacemesh
 	url = https://code.google.com/p/starlab.surfacemesh/

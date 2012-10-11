@@ -1,6 +1,6 @@
 CONFIG += starlab
 STARLAB_TEMPLATE = dynamic
-STARLAB_DEPENDS = common
+STARLAB_DEPENDS = starlib
 
 # Dependencies
 DEFINES += EXPORTFLAG
