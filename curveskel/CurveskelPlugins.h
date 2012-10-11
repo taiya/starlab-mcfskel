@@ -3,6 +3,7 @@
 #include "interfaces/InputOutputPlugin.h"
 #include "interfaces/FilterPlugin.h"
 #include "interfaces/RenderPlugin.h"
+#include "parameters/RichParameterSet.h"
 
 using namespace CurveskelTypes;
 

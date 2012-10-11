@@ -59,8 +59,8 @@ Model* curveskel_io_skc::open(QString path){
     }
     file.close();
 
-    DEB qDebug("Parsed %d/%d vertices",i_vertices,n_vertices);
-    DEB qDebug("Parsed %d/%d edges",i_edges,n_edges);
+    // DEB qDebug("Parsed %d/%d vertices",i_vertices,n_vertices);
+    // DEB qDebug("Parsed %d/%d edges",i_edges,n_edges);
     
     /// Show warnings
     if(i_vertices!=n_vertices) qWarning("Expected %d vertices, but parsed %d",n_vertices,i_vertices );

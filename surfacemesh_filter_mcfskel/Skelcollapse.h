@@ -5,7 +5,6 @@
 #include "SurfaceMeshPlugins.h"
 #include "StarlabDrawArea.h"
 #include "SurfaceMeshHelper.h"
-#include "RichParameterSet.h"
 #include "Logfile.h"
 
 typedef QList<Surface_mesh::Vertex> VertexList;

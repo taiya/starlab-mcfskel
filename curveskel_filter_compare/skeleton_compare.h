@@ -1,5 +1,4 @@
 #pragma once
-#include "RichParameterSet.h"
 #include "CurveskelModel.h"
 #include "CurveskelPlugins.h"
 

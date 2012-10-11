@@ -1,6 +1,5 @@
 #include "skeleton_resample.h"
 #include "StarlabDrawArea.h"
-#include "RichParameterSet.h"
 
 void skeleton_resample::initParameters(RichParameterSet *parameters){
    parameters->addParam(new RichFloat("Edge length", 0.001));

@@ -1,6 +1,5 @@
 #include "LaplacianRemesher.h"
 #include "SurfaceMeshHelper.h"
-#include "RichParameterSet.h"
 #include "StarlabDrawArea.h"
 
 /// Why isn't this working well? DISABLE FOR NOW

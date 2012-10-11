@@ -1,7 +1,6 @@
 #pragma once
 #include <QString>
 #include "SurfaceMeshPlugins.h"
-#include "RichParameterSet.h"
 
 /// Parameter names
 const QString embedVertices = "embedVertices";

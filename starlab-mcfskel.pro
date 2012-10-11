@@ -14,18 +14,18 @@ SUBDIRS += surfacemesh/surfacemesh_render_transparent
 
 # Add some components to deal with curve-skeletons
 # (This was a horrible idea.. we should have just re-used the surfacemesh)
-#SUBDIRS += curveskel
-#SUBDIRS += curveskel_io_cg
-#SUBDIRS += curveskel_io_skc
-#SUBDIRS += curveskel_render_lines
-#SUBDIRS += curveskel_filter_resample
-#SUBDIRS += curveskel_filter_compare
+SUBDIRS += curveskel
+SUBDIRS += curveskel_io_cg
+SUBDIRS += curveskel_io_skc
+SUBDIRS += curveskel_render_lines
+SUBDIRS += curveskel_filter_resample
+SUBDIRS += curveskel_filter_compare
 
 # Add the components of this plugin
 # @note we are using a custom "io_obj" plugin
-#SUBDIRS += surfacemesh_filter_remesher
+SUBDIRS += surfacemesh_io_obj
+SUBDIRS += surfacemesh_filter_remesher
+SUBDIRS += surfacemesh_filter_to_skeleton
 #SUBDIRS += surfacemesh_filter_voromat
 #SUBDIRS += surfacemesh_filter_mcfskel
-#SUBDIRS += surfacemesh_filter_to_skeleton
-#SUBDIRS += surfacemesh_io_obj
 

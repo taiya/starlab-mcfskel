@@ -7,7 +7,7 @@
 using namespace CurveskelTypes;
 
 Model *curveskel_io_cg::open(QString path){
-    DEB qDebug() << "curveskel_io_cg::open()";
+    // DEB qDebug() << "curveskel_io_cg::open()";
     //assertValidPath(path);
     QString name = pathToName(path);
     CurveskelModel* model = new CurveskelModel(path,name);
