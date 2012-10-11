@@ -45,7 +45,10 @@ protected:
             Point d0 = (p0 - p2).normalize();
             Point d1 = (p1 - p2).normalize();
             Scalar c  = dot(d0,d1);
-            if(secure) if (c<lb) c=lb; else if (c>ub) c=ub;
+            if(secure){
+                c = (c<lb) ? lb:c;
+                c = (c>ub) ? ub:c;
+            }
             w += 1.0 / tan(acos(c));
         }
         
@@ -55,7 +58,10 @@ protected:
             Point d0 = (p0 - p2).normalize();
             Point d1 = (p1 - p2).normalize();
             Scalar c  = dot(d0,d1);
-            if(secure) if (c<lb) c=lb; else if (c>ub) c=ub;
+            if(secure){
+                c = (c<lb) ? lb:c;
+                c = (c>ub) ? ub:c;
+            }
             w += 1.0 / tan(acos(c));
         }
         
