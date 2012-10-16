@@ -1,1 +1,2 @@
-QT += xml opengl
+INCLUDEPATH *= $$PWD
+DEPENDPATH  *= $$PWD

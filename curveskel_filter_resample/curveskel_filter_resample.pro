@@ -1,6 +1,6 @@
-CONFIG += starlab 
-STARLAB_TEMPLATE += plugin 
-STARLAB_DEPENDS += ../curveskel
+load(starlab)
+StarlabDepends(curveskel)
+StarlabTemplate(plugin)
 
 HEADERS += skeleton_resample.h
 SOURCES += skeleton_resample.cpp
