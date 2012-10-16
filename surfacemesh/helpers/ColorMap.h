@@ -50,7 +50,7 @@ public:
         if(isnan(val)) return Color(invalid.toRgb());
         Scalar alpha = qBound( -1.0, val/largestBound, +1.0 ); // [-1,1]
         QColor retval;
-        Scalar h,s,v;
+        Scalar h=0,s=0,v=0;
         
         /// Interpolate differently on the sides
         if(alpha>=0){

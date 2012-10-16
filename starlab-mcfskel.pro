@@ -1,7 +1,7 @@
 #---- Specify which starlab features I am going to use
 system(qmake -set QMAKEFEATURES $$PWD/starlab-core:$$PWD/starlab-core/external:$$PWD/surfacemesh:$$PWD/curveskel)
 #---- In mac put the bundle Starlab.app is deployed on the desktop
-mac:system(export STARLABPREFIX=$HOME/Desktop)
+unix:system(export STARLABPREFIX=$HOME/Desktop)
 
 
 TEMPLATE = subdirs

@@ -1,4 +1,4 @@
-#include <qgl.h>
+#include <QtOpenGL>
 #include "surfacemesh_render_smooth.h"
 #include "surface_mesh/gl_wrappers.h"
 

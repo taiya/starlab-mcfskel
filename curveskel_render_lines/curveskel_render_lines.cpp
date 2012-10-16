@@ -1,5 +1,5 @@
 #include "curveskel_render_lines.h"
-#include <qgl.h>
+#include <QtOpenGL>
 
 void curveskel_render_lines::render(){
     glClear(GL_DEPTH_BUFFER_BIT);

@@ -1,8 +1,13 @@
-#include <qgl.h>
-#include <glu.h>
+#include <QtOpenGL>
 #include "surfacemesh_render_transparent.h"
 #include "surface_mesh/gl_wrappers.h"
 
+// GLU was removed from Qt in version 4.8 
+#ifdef Q_OS_MAC
+# include <OpenGL/glu.h>
+#else
+# include <GL/glu.h>
+#endif
 
 typedef Surface_mesh::Face_iterator FaceItr;
 typedef std::pair<double, FaceItr> DepthFace;
