@@ -1,6 +1,6 @@
-CONFIG += starlab 
-STARLAB_TEMPLATE += plugin 
-STARLAB_DEPENDS += ../surfacemesh/surfacemesh
+load(starlab)
+StarlabDepends(surfacemesh)
+StarlabTemplate(plugin)
 
 HEADERS += LaplacianRemesher.h
 SOURCES += LaplacianRemesher.cpp

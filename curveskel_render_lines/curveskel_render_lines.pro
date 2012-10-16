@@ -1,7 +1,6 @@
-CONFIG += starlab 
-STARLAB_TEMPLATE = plugin 
-STARLAB_DEPENDS += ../curveskel
-QT += opengl
+load(starlab)
+StarlabDepends(curveskel)
+StarlabTemplate(plugin)
 
 HEADERS = curveskel_render_lines.h
 SOURCES = curveskel_render_lines.cpp

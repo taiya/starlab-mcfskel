@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>surfacemesh_render_smooth.png</file>
+    </qresource>
+</RCC>

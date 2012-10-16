@@ -1,19 +1,23 @@
-system(qmake -set QMAKEFEATURES $$PWD/starlab.core)
+#---- Specify which starlab features I am going to use
+system(qmake -set QMAKEFEATURES $$PWD/starlab-core:$$PWD/starlab-core/external:$$PWD/surfacemesh:$$PWD/curveskel)
+#---- In mac put the bundle Starlab.app is deployed on the desktop
+mac:system(export STARLABPREFIX=$HOME/Desktop)
+
+
 TEMPLATE = subdirs
 CONFIG += ordered
 
 # We are loading the full core, you can also compile this independently
 SUBDIRS += starlab-core
 
-# We are building only a portion of the surfacemesh submodule
-SUBDIRS += surfacemesh/surfacemesh
-SUBDIRS += surfacemesh/surfacemesh_filter_normalize
-SUBDIRS += surfacemesh/surfacemesh_render_smooth
-SUBDIRS += surfacemesh/surfacemesh_render_flatwire
-SUBDIRS += surfacemesh/surfacemesh_render_transparent
+# We have imported only a PORTION of the full starlab
+SUBDIRS += surfacemesh
+SUBDIRS += surfacemesh_filter_normalize
+SUBDIRS += surfacemesh_render_smooth
+SUBDIRS += surfacemesh_render_flatwire
+SUBDIRS += surfacemesh_render_transparent
 
 # Add some components to deal with curve-skeletons
-# (This was a horrible idea.. we should have just re-used the surfacemesh)
 SUBDIRS += curveskel
 SUBDIRS += curveskel_io_cg
 SUBDIRS += curveskel_io_skc
@@ -21,11 +25,10 @@ SUBDIRS += curveskel_render_lines
 SUBDIRS += curveskel_filter_resample
 SUBDIRS += curveskel_filter_compare
 
-# Add the components of this plugin
-# @note we are using a custom "io_obj" plugin
-SUBDIRS += surfacemesh_io_obj
+# And the ones specific to this project
+SUBDIRS += surfacemesh_io_obj #< customized!!
 SUBDIRS += surfacemesh_filter_remesher
 SUBDIRS += surfacemesh_filter_to_skeleton
-#SUBDIRS += surfacemesh_filter_voromat
-#SUBDIRS += surfacemesh_filter_mcfskel
+SUBDIRS += surfacemesh_filter_voromat
+SUBDIRS += surfacemesh_filter_mcfskel
 
