@@ -1,7 +1,0 @@
-load($$[STARLAB])
-StarlabTemplate(modelprf)
-
-INCLUDEPATH *= $$PWD/helpers
-DEPENDPATH  *= $$PWD/helpers
-
-

@@ -5,12 +5,12 @@ CONFIG += ordered
 # We are loading the full core, you can also compile this independently
 SUBDIRS += starlab-core
 
-# We have imported only a PORTION of the full starlab
-SUBDIRS += surfacemesh
-SUBDIRS += surfacemesh_filter_normalize
-SUBDIRS += surfacemesh_render_smooth
-SUBDIRS += surfacemesh_render_flatwire
-SUBDIRS += surfacemesh_render_transparent
+# We have imported only a PORTION of the full surfacemesh
+SUBDIRS += starlab-surfacemesh/surfacemesh
+SUBDIRS += starlab-surfacemesh/surfacemesh_filter_normalize
+SUBDIRS += starlab-surfacemesh/surfacemesh_render_smooth
+SUBDIRS += starlab-surfacemesh/surfacemesh_render_flatwire
+SUBDIRS += starlab-surfacemesh/surfacemesh_render_transparent
 
 # Add some components to deal with curve-skeletons
 SUBDIRS += curveskel
