@@ -2,7 +2,7 @@
 #include "StarlabDrawArea.h"
 
 void skeleton_resample::initParameters(RichParameterSet *parameters){
-   parameters->addParam(new RichFloat("Edge length", 0.001));
+   parameters->addParam(new RichFloat("Edge length", 0.001f));
 }
 
 void skeleton_resample::applyFilter(RichParameterSet* pars){

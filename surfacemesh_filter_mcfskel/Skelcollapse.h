@@ -1,5 +1,7 @@
 #pragma once
+#if !defined(_WIN32)
 #pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif
 
 #include <QDir>
 #include "SurfaceMeshPlugins.h"
@@ -50,12 +52,12 @@ private:
 public:
     void initParameters(RichParameterSet* parameters){
         Scalar scale = 0.002*mesh()->bbox().size().length();
-        parameters->addParam(new RichFloat("omega_L_0",1));
-        parameters->addParam(new RichFloat("omega_H_0",use_matlab?20:0.1));
-        parameters->addParam(new RichFloat("omega_P_0",use_matlab?40:0.2));
+        parameters->addParam(new RichFloat("omega_L_0",1.0f));
+        parameters->addParam(new RichFloat("omega_H_0",use_matlab?20.0f:0.1f));
+        parameters->addParam(new RichFloat("omega_P_0",use_matlab?40.0f:0.2f));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
-        parameters->addParam(new RichFloat("alpha",0.15));
-        parameters->addParam(new RichFloat("zero_TH",1e-10));
+        parameters->addParam(new RichFloat("alpha",0.15f));
+        parameters->addParam(new RichFloat("zero_TH",1e-10f));
         
         /// Add a transparent copy of the model, must be done only when the parameter window
         /// is open (a.k.a. on first iteration)

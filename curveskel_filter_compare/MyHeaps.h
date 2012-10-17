@@ -37,6 +37,10 @@ class InvalidIndexException : public out_of_range{
 	InvalidIndexException(const string &message) : out_of_range(message) {;}	
 };
 
+#if defined(_WIN32)
+#pragma warning( disable : 4290 ) // For VS2010 unsupported exceptions
+#endif
+
 /**
  * This class provides a back-inxedex heap structure where indexes of 
  * elements already in the heap are kept updated to allow for random access
