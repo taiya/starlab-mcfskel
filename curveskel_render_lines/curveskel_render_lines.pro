@@ -1,5 +1,5 @@
-load(starlab)
-StarlabDepends(curveskel)
+load($$[STARLAB])
+load($$[CURVESKEL])
 StarlabTemplate(plugin)
 
 HEADERS = curveskel_render_lines.h

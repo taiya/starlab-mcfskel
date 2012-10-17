@@ -1,8 +1,7 @@
-INCLUDEPATH *= $$PWD
-DEPENDPATH  *= $$PWD
+load($$[STARLAB])
+StarlabTemplate(modelprf)
+
 INCLUDEPATH *= $$PWD/helpers
 DEPENDPATH  *= $$PWD/helpers
 
-#export(INCLUDEPATH)
-#export(DEPENDPATH)
 

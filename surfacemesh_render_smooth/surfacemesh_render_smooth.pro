@@ -1,5 +1,5 @@
-load(starlab)
-StarlabDepends(surfacemesh)
+load($$[STARLAB])
+load($$[SURFACEMESH])
 StarlabTemplate(plugin)
 
 HEADERS = surfacemesh_render_smooth.h

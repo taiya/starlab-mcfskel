@@ -1,7 +1,7 @@
-load(starlab)
+load($$[STARLAB])
+load($$[SURFACEMESH])
+load($$[QHULL])
 StarlabTemplate(plugin)
-StarlabDepends(surfacemesh)
-StarlabExternal(qhull)
 
 # COMMENT OUT FOR QHULL
 #CONFIG += matlab

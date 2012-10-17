@@ -1,9 +1,12 @@
-load(starlab)
+load($$[STARLAB])
 StarlabTemplate(sharedlib)
+
+# expose library to qmake
+system(qmake -set CURVESKEL $$PWD/curveskel)
+OTHER_FILES += curveskel.prf
 
 # Dependencies
 DEFINES += EXPORTFLAG
-OTHER_FILES += *.prf
 
 HEADERS += \
     global.h \

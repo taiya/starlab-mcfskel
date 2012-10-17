@@ -1,8 +1,8 @@
-load(starlab)
+load($$[STARLAB])
+load($$[CHOLMOD])
+load($$[EIGEN])
+load($$[SURFACEMESH])
 StarlabTemplate(plugin)
-StarlabDepends(surfacemesh)
-StarlabExternal(eigen)
-StarlabExternal(cholmod)
 
 # Uncomment to use matlab as a solver instead of eigen
 # CONFIG += matlab 

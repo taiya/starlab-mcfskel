@@ -1,5 +1,8 @@
-load(starlab)
+load($$[STARLAB])
 StarlabTemplate(sharedlib)
+
+# Expose this to the global build
+system(qmake -set SURFACEMESH $$PWD/surfacemesh.prf)
 OTHER_FILES = surfacemesh.prf
 
 DEFINES += DYNAMIC_SURFACEMESH

@@ -1,9 +1,4 @@
-#---- Specify which starlab features I am going to use
-system(qmake -set QMAKEFEATURES $$PWD/starlab-core:$$PWD/starlab-core/external:$$PWD/surfacemesh:$$PWD/curveskel)
-#---- In mac put the bundle Starlab.app is deployed on the desktop
-unix:system(export STARLABPREFIX=$HOME/Desktop)
-
-
+#--- Setup the global paths
 TEMPLATE = subdirs
 CONFIG += ordered
 
@@ -31,4 +26,3 @@ SUBDIRS += surfacemesh_filter_remesher
 SUBDIRS += surfacemesh_filter_to_skeleton
 SUBDIRS += surfacemesh_filter_voromat
 SUBDIRS += surfacemesh_filter_mcfskel
-
