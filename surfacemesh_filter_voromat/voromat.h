@@ -13,7 +13,7 @@ const std::string VRADII = "v:radii";
 const std::string VANGLE = "v:angle";
 const std::string VPOLE  = "v:pole";
 
-class voromat : public SurfaceMeshFilterPlugin{
+class filter : public SurfaceMeshFilterPlugin{
     Q_OBJECT
     Q_INTERFACES(FilterPlugin)
 

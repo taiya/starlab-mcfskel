@@ -3,19 +3,13 @@ load($$[SURFACEMESH])
 load($$[QHULL])
 StarlabTemplate(plugin)
 
-# COMMENT OUT FOR QHULL
-#CONFIG += matlab
+HEADERS += voromat.h
 
-# which library to import?
-CONFIG(matlab){
-    STARLAB_EXTERNAL += matlab
-} else {
-    DEFINES += QHULL
-    STARLAB_EXTERNAL += qhull
-}
+#---- QHULL VERSION
+HEADERS += QhullVoronoiHelper.h
+SOURCES += voromat_qhull.cpp
 
-HEADERS += voromat.h \
-    MatlabVoronoiHelper.h \
-    VoronoiHelper.h
-
-SOURCES += voromat.cpp
+#---- UNCOMMENT for MATLAB version
+# STARLAB_EXTERNAL += matlab
+# SOURCES += voromat_matlab.cpp
+# HEADERS += MatlabVoronoiHelper.h

@@ -2,6 +2,7 @@
 #include "helpers/StatisticsHelper.h"
 #include "helpers/ColorizeHelper.h"
 #include <QElapsedTimer>
+#include "StarlabDrawArea.h"
 
 #ifdef MATLAB
 #include "MatlabVoronoiHelper.h"
@@ -11,7 +12,7 @@
 #include "VoronoiHelper.h"
 #endif
 
-void voromat::applyFilter(RichParameterSet* pars){
+void filter::applyFilter(RichParameterSet* pars){
     /// Draw the input vertices if overlay was required
     if(pars->getBool(overlayInput)){
         Vector3VertexProperty points = mesh()->get_vertex_property<Vector3>(VPOINT);
@@ -43,7 +44,7 @@ void voromat::applyFilter(RichParameterSet* pars){
     mat.variableToVector3VertexProperty("points",propname);
 #endif
 
-#ifdef QHULL
+#if 1
     bool isEmbed = pars->getBool(embedVertices);
 
     timer.start();
@@ -66,6 +67,17 @@ void voromat::applyFilter(RichParameterSet* pars){
         ColorizeHelper(mesh(),unsignedColorMap).vscalar_to_vcolor(propname);
         // qDebug() << ScalarStatisticsHelper(mesh).statistics(propname);
     }
+    
+#if 1
+    Vector3VertexProperty points = mesh()->get_vertex_property<Vector3>(VPOINT);
+    ScalarVertexProperty  vradii = mesh()->get_vertex_property<Scalar>(VRADII);
+    SurfaceMeshModel* model = new SurfaceMeshModel("", "cloud");
+    document()->addModel(model);
+    foreach(Vertex v, mesh()->vertices()){
+        if(vradii[v]<3.14*.9)
+            model->add_vertex( points[v] );
+    }
+#endif
 }
 
 Q_EXPORT_PLUGIN(voromat)
