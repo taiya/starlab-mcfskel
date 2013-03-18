@@ -26,3 +26,5 @@ SUBDIRS += surfacemesh_filter_remesher
 SUBDIRS += surfacemesh_filter_to_skeleton
 SUBDIRS += surfacemesh_filter_voromat
 SUBDIRS += surfacemesh_filter_mcfskel
+SUBDIRS += surfacemesh_filter_isotropic_remesher
+

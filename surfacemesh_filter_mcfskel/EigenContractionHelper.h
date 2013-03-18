@@ -11,9 +11,12 @@
 
 using namespace Eigen;
 
-class EigenContractionHelper : public SurfaceMeshHelper{ 
+class EigenContractionHelper : public SurfaceMesh::SurfaceMeshHelper{
 private:
     int nrows, ncols;
+
+    typedef Surface_mesh::Vertex_property<uint>  IndexVertexProperty;
+
     IndexVertexProperty vindex;   
     SparseMatrix<double> LHS;
     MatrixXd RHS;
@@ -40,14 +43,14 @@ public:
     void createRHS(ScalarVertexProperty omega_H, Vector3VertexProperty vinitial);
     void createRHS(ScalarVertexProperty omega_H, Vector3VertexProperty vinitial, ScalarVertexProperty omega_P, Vector3VertexProperty poles);
     
-    void solveByFactorization(string vsolution);
+    void solveByFactorization(std::string vsolution);
     void solve_linear_least_square(SparseMatrix<double> & A, MatrixXd & B, MatrixXd & X);
 };
 
 void EigenContractionHelper::updateVertexIndexes(){
     /// Create indexes for mesh vertices
-    vindex = mesh->vertex_property<Index>("v:index",-1);
-    Index curr_vidx = 0;
+    vindex = mesh->vertex_property<uint>("v:index",0);
+    uint curr_vidx = 0;
     foreach(Vertex v, mesh->vertices())
         vindex[v] = curr_vidx++;
 }
@@ -158,7 +161,7 @@ void EigenContractionHelper::createRHS(ScalarVertexProperty omega_H, Vector3Vert
     // TIMER qDebug() << "Build RHS vector: " << timer.elapsed() << "ms";
 }
 
-void EigenContractionHelper::solveByFactorization(string vsolution){
+void EigenContractionHelper::solveByFactorization(std::string vsolution){
     /// Factorize & Solve
     // TIMER timer.start();
     {

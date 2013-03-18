@@ -7,6 +7,6 @@ class curveskel_io_cg : public CurveskelInputOutputPlugin{
     
 public:
     QString name(){ return "[Curveskel] Curve Graph (*.cg)"; }
-    Model* open(QString path);
+    Starlab::Model* open(QString path);
     void save(CurveskelModel*, QString);
 };

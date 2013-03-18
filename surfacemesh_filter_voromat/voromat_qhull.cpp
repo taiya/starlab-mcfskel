@@ -27,7 +27,7 @@ void filter::applyFilter(RichParameterSet* pars){
     /// Colorize one of the exposed properties
     if( pars->getBool(colorizeRadii) || pars->getBool(colorizeAngle) ){
         drawArea()->setRenderer(mesh(),"Smooth");
-        string propname;
+        std::string propname;
         if( pars->getBool(colorizeRadii) ) propname = VRADII;
         if( pars->getBool(colorizeAngle) ) propname = VANGLE;
         ColorizeHelper(mesh(),unsignedColorMap).vscalar_to_vcolor(propname);

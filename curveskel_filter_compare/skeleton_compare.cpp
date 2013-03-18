@@ -15,7 +15,7 @@ std::vector<double> toKDPoint(const CurveskelTypes::Point & from){
 void skeleton_compare::initParameters(RichParameterSet* pars){
     /// QMap of skeleton models indexed by name
     skeletons.clear();
-    foreach(Model* model, document()->models()){
+    foreach(Starlab::Model* model, document()->models()){
         if(model==document()->selectedModel()) continue;
         CurveskelModel* skel = qobject_cast<CurveskelModel*>(model);
         if(skel) skeletons.insert(model->name, skel);
@@ -34,7 +34,7 @@ void skeleton_compare::applyFilter(RichParameterSet* params){
     
     CurveskelModel* src = NULL;
     QString src_name = params->getString("Target Skeleton");
-    foreach(Model* curr, document()->models())
+    foreach(Starlab::Model* curr, document()->models())
         if(curr->name == src_name)
             src = qobject_cast<CurveskelModel*>( curr );
     Q_ASSERT(src);

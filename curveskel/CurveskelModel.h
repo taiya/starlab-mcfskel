@@ -15,9 +15,9 @@ namespace CurveskelTypes
     class CurveskelForEachEdgeHelper;
     /// @}
 
-    class EXPORT CurveskelModel : public Model, public CurveskelTypes::MyWingedMesh{
+    class EXPORT CurveskelModel : public Starlab::Model, public CurveskelTypes::MyWingedMesh{
         Q_OBJECT
-        Q_INTERFACES(Model)
+        Q_INTERFACES(Starlab::Model)
 
     public:
         CurveskelModel(QString path=QString(), QString name=QString());

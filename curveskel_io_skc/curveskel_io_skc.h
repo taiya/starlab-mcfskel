@@ -7,6 +7,6 @@ class curveskel_io_skc : public CurveskelInputOutputPlugin{
     
 public:
     QString name(){ return "[Curveskel] Day's Skeleton Curve (*.skc)"; }
-    Model* open(QString path);
+    Starlab::Model* open(QString path);
     void save(CurveskelModel*, QString);
 };

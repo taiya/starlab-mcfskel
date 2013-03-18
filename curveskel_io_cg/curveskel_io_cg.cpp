@@ -6,7 +6,7 @@
 
 using namespace CurveskelTypes;
 
-Model *curveskel_io_cg::open(QString path){
+Starlab::Model *curveskel_io_cg::open(QString path){
     // DEB qDebug() << "curveskel_io_cg::open()";
     //assertValidPath(path);
     QString name = pathToName(path);

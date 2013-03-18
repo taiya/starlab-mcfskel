@@ -125,10 +125,10 @@ public:
 		//    surface points a voronoi loci has been 
 		//    associated with. Assuming general positions 
 		//    this number should be always 4.
-		vector<int> counter(nvornoi, 0);
+        std::vector<int> counter(nvornoi, 0);
 
 		//--- For every voronoi cell
-		for(Index sidx = 0; (int)sidx < nvertices; sidx++)
+        for(uint sidx = 0; (int)sidx < nvertices; sidx++)
 		{
 			// Retrieve surface vertex
 			surf_vertex = points[Vertex(sidx)];
@@ -157,7 +157,7 @@ public:
 				// Project the loci on the vertex normal & Retain furthest 
 				double t = dot(voro_vertex - surf_vertex, surf_normal);
 				if(t < 0 && t < max_neg_t){
-                    drawArea->drawPoint(voro_vertex);
+                    //drawArea->drawPoint(voro_vertex);
 					max_neg_t = t;
 					max_neg_i = vidx;
 				}
@@ -191,7 +191,7 @@ public:
 
 			// Create the medial spokes
 			// General positions => only 4 vertices / loci
-			vector<Spoke> spokes;
+            std::vector<Spoke> spokes;
 			for(int i_sidx = 0; i_sidx < 4; i_sidx++)
 			{
 				// Retrieve surface coordinate

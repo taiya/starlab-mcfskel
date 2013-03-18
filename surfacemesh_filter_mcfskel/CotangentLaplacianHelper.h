@@ -4,7 +4,7 @@ class  CotangentLaplacianHelper : public SurfaceMeshHelper{
 public:
     CotangentLaplacianHelper(SurfaceMeshModel* mesh) : SurfaceMeshHelper(mesh){}
         
-    ScalarHalfedgeProperty computeCotangentEdgeWeights(const string property="e:weight"){
+    ScalarHalfedgeProperty computeCotangentEdgeWeights(const std::string property="e:weight"){
         ScalarHalfedgeProperty hweight = mesh->add_halfedge_property<Scalar>(property);
         foreach(Edge e, mesh->edges()){
             hweight[ mesh->halfedge(e,0) ] = cotangentLaplacianWeight(e);
@@ -13,7 +13,7 @@ public:
         return hweight;
     }
     
-    Vector3VertexProperty computeLaplacianVectors(ScalarHalfedgeProperty hweight, const string property="v:laplace", bool autonormalize=true){
+    Vector3VertexProperty computeLaplacianVectors(ScalarHalfedgeProperty hweight, const std::string property="v:laplace", bool autonormalize=true){
         Vector3VertexProperty laplace = mesh->vertex_property<Vector3>(property);
         foreach(Vertex v, mesh->vertices())
             laplace[v] = cotangentLaplacianVector(hweight,v,autonormalize);
