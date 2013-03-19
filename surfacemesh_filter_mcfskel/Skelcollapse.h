@@ -57,14 +57,14 @@ public:
         parameters->addParam(new RichFloat("omega_P_0",use_matlab?40.0f:0.2f));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
         parameters->addParam(new RichFloat("alpha",0.15f));
-        parameters->addParam(new RichFloat("zero_TH",1e-10f));
+        parameters->addParam(new RichFloat("zero_TH",1e-7f));
         
         /// Add a transparent copy of the model, must be done only when the parameter window
         /// is open (a.k.a. on first iteration)
-        SurfaceMeshModel* copy = new SurfaceMeshModel(mesh()->path,"original");
-        copy->read( mesh()->path.toStdString() );
-        document()->addModel(copy);
-        drawArea()->setRenderer(copy,"Transparent"); 
+        //SurfaceMeshModel* copy = new SurfaceMeshModel(mesh()->path,"original");
+        //copy->read( mesh()->path.toStdString() );
+        //document()->addModel(copy);
+        //drawArea()->setRenderer(copy,"Transparent");
     }
 
     void applyFilter(RichParameterSet* pars){
