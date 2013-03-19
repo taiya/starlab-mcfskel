@@ -70,6 +70,8 @@ public:
 			QhullPoint qhpnt = f.voronoiVertex(qhull.runId());
 			Vector3 p(qhpnt[0], qhpnt[1], qhpnt[2]);
 
+            if(!mesh->bbox().contains(p)) continue;
+
 			loci.push_back(p);
 			
 			foreach(QhullVertex v, f.vertices())
