@@ -1,23 +1,20 @@
 #include "IsotropicRemesher.h"
 #include "SurfaceMeshHelper.h"
 #include "StarlabDrawArea.h"
+#include <QElapsedTimer>
 
 #include "MathHelper.h"
 
-void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations )
+void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool isProjectSurface )
 {
+    QElapsedTimer timer; timer.start();
+
     const double low  = (4.0 / 5.0) * targetEdgeLength;
     const double high = (4.0 / 3.0) * targetEdgeLength;
 
     // Copy original mesh
     SurfaceMeshModel* copy = new SurfaceMeshModel(mesh()->path,"original");
-    copy->read( mesh()->path.toStdString() );
-
-    // Build KD-tree
-    kdtree.cloud.pts.clear();
-    foreach(Vertex v, mesh()->vertices())
-        kdtree.addPoint(points[v]);
-    kdtree.build();
+    if(isProjectSurface) copy->read( mesh()->path.toStdString() );
 
     for(int i = 0; i < numIterations; i++)
     {
@@ -25,8 +22,10 @@ void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations )
         collapseShortEdges(low, high);
         equalizeValences();
         tangentialRelaxation();
-        //projectToSurface(copy);
+        if(isProjectSurface) projectToSurface( copy );
     }
+
+    qDebug() << "[IsotropicRemesher] time spent " << timer.elapsed() << " ms." ;
 }
 
 /// performs edge splits until all edges are shorter than the threshold
@@ -250,46 +249,34 @@ void IsotropicRemesher::tangentialRelaxation(  )
     mesh()->remove_vertex_property(q);
 }
 
-Vector3 IsotropicRemesher::findNearestPoint(SurfaceMeshModel * orginal_mesh, const Vector3& _point, SurfaceMeshModel::Face& _fh, double* _dbest)
+Vector3 IsotropicRemesher::findNearestPoint(SurfaceMeshModel * original_mesh, const Vector3& _point, SurfaceMeshModel::Face& _fh, double* _dbest)
 {
-    Vector3VertexProperty orig_points = orginal_mesh->vertex_property<Vector3>( VPOINT );
-
-    Vector3  p_best = orig_points[ Vertex(0) ];
+    Vector3VertexProperty orig_points = original_mesh->vertex_property<Vector3>( VPOINT );
+    Vector3  p_best = Vector3(original_mesh->bbox().size().length() * 2) + (Vector3)original_mesh->bbox().center();
     SurfaceMeshModel::Scalar d_best = (_point - p_best).sqrnorm();
-
     SurfaceMeshModel::Face fh_best;
 
     // exhaustive search
-    SurfaceMeshModel::Face_iterator cf_it  = orginal_mesh->faces_begin();
-    SurfaceMeshModel::Face_iterator cf_end = orginal_mesh->faces_end();
-
-    KDResults matches;
-    kdtree.k_closest(_point, 32, matches);
-
-    foreach(KDResultPair match, matches)
+    foreach(Face f, original_mesh->faces())
     {
-        int vi = match.first;
+        Surface_mesh::Vertex_around_face_circulator cfv_it = original_mesh->vertices(f);
 
-        foreach(Halfedge h, orginal_mesh->onering_hedges(Vertex(vi)))
+        // Assume triangular
+        const Vector3& pt0 = orig_points[   cfv_it];
+        const Vector3& pt1 = orig_points[ ++cfv_it];
+        const Vector3& pt2 = orig_points[ ++cfv_it];
+
+        Vector3 ptn = _point;
+
+        //SurfaceMeshModel::Scalar d = distPointTriangleSquared( _point, pt0, pt1, pt2, ptn );
+        SurfaceMeshModel::Scalar d = ClosestPointTriangle( _point, pt0, pt1, pt2, ptn );
+
+        if( d < d_best)
         {
-            SurfaceMeshModel::Vertex_around_face_circulator cfv_it = orginal_mesh->vertices( orginal_mesh->face(h) );
+            d_best = d;
+            p_best = ptn;
 
-            // Assume triangular
-            const Vector3& pt0 = orig_points[   cfv_it];
-            const Vector3& pt1 = orig_points[ ++cfv_it];
-            const Vector3& pt2 = orig_points[ ++cfv_it];
-
-            Vector3 ptn;
-
-            SurfaceMeshModel::Scalar d = distPointTriangleSquared( _point, pt0, pt1, pt2, ptn );
-
-            if( d < d_best)
-            {
-                d_best = d;
-                p_best = ptn;
-
-                fh_best = cf_it;
-            }
+            fh_best = f;
         }
     }
 
@@ -297,8 +284,7 @@ Vector3 IsotropicRemesher::findNearestPoint(SurfaceMeshModel * orginal_mesh, con
     _fh = fh_best;
 
     // return distance
-    if(_dbest)
-        *_dbest = sqrt(d_best);
+    if(_dbest) *_dbest = sqrt(d_best);
 
     return p_best;
 }
@@ -314,6 +300,7 @@ void IsotropicRemesher::projectToSurface(SurfaceMeshModel * orginal_mesh )
         if ( isFeature(v_it)) continue;
 
         Vector3 p = points[v_it];
+
         SurfaceMeshModel::Face fhNear;
         double distance;
 

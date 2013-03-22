@@ -1,6 +1,6 @@
 load($$[STARLAB])
 load($$[SURFACEMESH])
-load($$[NANOFLANN])
+load($$[OCTREE])
 StarlabTemplate(plugin)
 
 HEADERS += IsotropicRemesher.h

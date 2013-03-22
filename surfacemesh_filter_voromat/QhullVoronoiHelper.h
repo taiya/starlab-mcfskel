@@ -120,8 +120,8 @@ public:
 		Vector3 voro_vertex;
 		Vector3 surf_normal;
 
-		poleof = std::vector<int>(nvertices);
-		scorr  = std::vector< std::vector<int> > (nvornoi, std::vector<int>(4)); 
+        poleof = std::vector<int>(nvertices, 0);
+        scorr  = std::vector< std::vector<int> > (nvornoi, std::vector<int>(4, 0));
 
 		//--- Keeps track of how many 
 		//    surface points a voronoi loci has been 
@@ -138,7 +138,7 @@ public:
 
 			// Index and distance to furthest voronoi loci
 			double max_neg_t = DBL_MAX;
-			double max_neg_i = -1;
+            double max_neg_i = 0;
 
 			// For each element of its voronoi cell
 			for(int j = 0; j < (int)cells[sidx].size(); j++)

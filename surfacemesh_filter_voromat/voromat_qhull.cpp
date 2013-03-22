@@ -15,6 +15,10 @@ void filter::applyFilter(RichParameterSet* pars){
             
     bool isEmbed = pars->getBool(embedVertices);
 
+    // We need normals
+    mesh()->update_face_normals();
+    mesh()->update_vertex_normals();
+
     QElapsedTimer timer;
     timer.start();
         VoronoiHelper h(mesh(), drawArea());

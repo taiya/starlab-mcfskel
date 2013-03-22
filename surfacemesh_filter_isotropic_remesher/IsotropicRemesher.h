@@ -1,7 +1,6 @@
 #pragma once
 #include "SurfaceMeshPlugins.h"
 #include "SurfaceMeshHelper.h"
-#include "NanoKdTree.h"
 
 class IsotropicRemesher : public SurfaceMeshFilterPlugin{
     Q_OBJECT
@@ -14,11 +13,10 @@ public:
     void initParameters(RichParameterSet* parameters);
 
     Vector3VertexProperty points;
-	BoolEdgeProperty efeature;
-    NanoKdTree kdtree;
+    BoolEdgeProperty efeature;
 
 private:
-    void remesh(double targetEdgeLength, int numIterations);
+    void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface=true);
     void splitLongEdges(double maxEdgeLength);
     void collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength);
     void equalizeValences();
@@ -28,5 +26,5 @@ private:
     bool isFeature(const SurfaceMeshModel::Vertex &_vh);
 
     void projectToSurface(SurfaceMeshModel * orginal_mesh);
-	Vector3 findNearestPoint(SurfaceMeshModel * orginal_mesh, const Vector3& _point, SurfaceMeshModel::Face& _fh ,double* _dbest);
+    Vector3 findNearestPoint(SurfaceMeshModel * orginal_mesh, const Vector3& _point, SurfaceMeshModel::Face& _fh ,double* _dbest);
 };
