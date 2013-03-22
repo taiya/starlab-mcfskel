@@ -34,9 +34,12 @@ private:
     bool isApplicable(Starlab::Model* model) { return isA(model); }
 };
 
+class CurveskelModelRenderer : public Renderer{
+public:
+    CurveskelModel* skel() { return safeCast(model()); }
+};
+
 class CurveskelRenderPlugin : public RenderPlugin{
 private:
     bool isApplicable(Starlab::Model* model){ return isA(model); }
-protected:
-	CurveskelModel* skel() { return safeCast(model()); }
 };
