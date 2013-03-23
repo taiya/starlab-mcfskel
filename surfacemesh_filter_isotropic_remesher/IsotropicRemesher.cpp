@@ -14,7 +14,7 @@ void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool 
 
     // Copy original mesh
     SurfaceMeshModel* copy = new SurfaceMeshModel(mesh()->path,"original");
-    if(isProjectSurface) copy->read( mesh()->path.toStdString() );
+    if(isProjectSurface) *(Surface_mesh*)copy = *(Surface_mesh*)mesh();
 
     for(int i = 0; i < numIterations; i++)
     {
