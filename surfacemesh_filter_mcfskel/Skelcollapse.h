@@ -51,7 +51,7 @@ private:
         
 public:
     void initParameters(RichParameterSet* parameters){
-        Scalar scale = 0.002*mesh()->bbox().size().length();
+        Scalar scale = 0.002*mesh()->bbox().diagonal().norm();
         parameters->addParam(new RichFloat("omega_L_0",1.0f));
         parameters->addParam(new RichFloat("omega_H_0",use_matlab?20.0f:0.1f));
         parameters->addParam(new RichFloat("omega_P_0",use_matlab?40.0f:0.2f));

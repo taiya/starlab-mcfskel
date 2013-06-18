@@ -17,8 +17,8 @@ void skeleton_resample::applyFilter(RichParameterSet* pars){
         recursiveSplitEdge(e, threshold);
 
     /// After splitting them visualize the density
-    foreach(CurveskelModel::Vertex v, skel->vertices())
-        drawArea()->drawPoint(skel_points[v],2,Qt::blue);
+    //foreach(CurveskelModel::Vertex v, skel->vertices())
+    //    drawArea()->drawPoint(skel_points[v],2,Qt::blue);
     
     /// Print out average edge length
     double avg=0;
@@ -26,7 +26,7 @@ void skeleton_resample::applyFilter(RichParameterSet* pars){
         avg += skel->edge_length(e);
     avg /= skel->n_edges();
 
-    double bbox_diag = skel->bbox().size().length();
+    double bbox_diag = skel->bbox().diagonal().norm();
     double bboxnorm_avg = avg/bbox_diag;
     
     qDebug() << skel->name << "resampled to average edge length:" << avg << ", w.r.t. bbox: " << bboxnorm_avg;

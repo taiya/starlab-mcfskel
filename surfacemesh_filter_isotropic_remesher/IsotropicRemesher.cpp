@@ -46,7 +46,7 @@ void IsotropicRemesher::splitLongEdges(double maxEdgeLength )
         Vector3 vec = points[v1] - points[v0];
 
         // edge to long?
-        if ( vec.sqrnorm() > maxEdgeLengthSqr ){
+        if ( vec.squaredNorm() > maxEdgeLengthSqr ){
 
             const Vector3 midPoint = points[v0] + ( 0.5 * vec );
 
@@ -103,7 +103,7 @@ void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const do
 
             const Vector3 vec = points[v1] - points[v0];
 
-            const double edgeLength = vec.sqrnorm();
+            const double edgeLength = vec.squaredNorm();
 
             // edge too short but don't try to collapse edges that have length 0
             if ( (edgeLength < _minEdgeLengthSqr) && (edgeLength > DBL_EPSILON) ){
@@ -115,7 +115,7 @@ void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const do
 
                 foreach( Halfedge hvit, mesh()->onering_hedges(v0) )
                 {
-                    double d = (B - points[ mesh()->to_vertex(hvit) ]).sqrnorm();
+                    double d = (B - points[ mesh()->to_vertex(hvit) ]).squaredNorm();
 
                     if ( d > _maxEdgeLengthSqr || mesh()->is_boundary( mesh()->edge( hvit ) ) || efeature[mesh()->edge(hvit)] )
                     {
@@ -221,7 +221,7 @@ void IsotropicRemesher::tangentialRelaxation(  )
     //first compute barycenters
     for (v_it = mesh()->vertices_begin(); v_it != v_end; ++v_it){
 
-        Vector3 tmp(0);
+        Vector3 tmp(0,0,0);
         uint N = 0;
 
         foreach( Halfedge hvit, mesh()->onering_hedges(v_it) )
@@ -252,8 +252,10 @@ void IsotropicRemesher::tangentialRelaxation(  )
 Vector3 IsotropicRemesher::findNearestPoint(SurfaceMeshModel * original_mesh, const Vector3& _point, SurfaceMeshModel::Face& _fh, double* _dbest)
 {
     Vector3VertexProperty orig_points = original_mesh->vertex_property<Vector3>( VPOINT );
-    Vector3  p_best = Vector3(original_mesh->bbox().size().length() * 2) + (Vector3)original_mesh->bbox().center();
-    SurfaceMeshModel::Scalar d_best = (_point - p_best).sqrnorm();
+
+	double fc = original_mesh->bbox().diagonal().norm() * 2;
+    Vector3  p_best = Vector3(fc,fc,fc) + Vector3(original_mesh->bbox().center());
+    SurfaceMeshModel::Scalar d_best = (_point - p_best).squaredNorm();
     SurfaceMeshModel::Face fh_best;
 
     // exhaustive search
@@ -312,7 +314,7 @@ void IsotropicRemesher::projectToSurface(SurfaceMeshModel * orginal_mesh )
 
 void IsotropicRemesher::initParameters(RichParameterSet* parameters)
 {
-    Scalar edgelength_TH = 0.02 * mesh()->bbox().size().length();
+    Scalar edgelength_TH = 0.02 * mesh()->bbox().diagonal().norm();
 
     parameters->addParam(new RichFloat("edgelength_TH",edgelength_TH,"Target edge length", "By default it's 2% of bbox diagonal"));
 

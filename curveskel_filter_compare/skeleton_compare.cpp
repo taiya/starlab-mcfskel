@@ -30,7 +30,7 @@ void skeleton_compare::initParameters(RichParameterSet* pars){
 void skeleton_compare::applyFilter(RichParameterSet* params){
     drawArea()->deleteAllRenderObjects();
     
-    bool show_measurements = params->getBool("Show measurements");
+    //bool show_measurements = params->getBool("Show measurements");
     
     CurveskelModel* src = NULL;
     QString src_name = params->getString("Target Skeleton");
@@ -63,11 +63,11 @@ void skeleton_compare::applyFilter(RichParameterSet* params){
             src_tree.closest_point( toKDPoint( target_pnts[v] ), closeidx, di);
             avgDifference += di;
             
-            if(show_measurements)
-                drawArea()->drawSegment( target_pnts[v], src_pnts[ CurveskelTypes::Vertex(closeidx) ], 2, Qt::blue);            
+            //if(show_measurements)
+            //    drawArea()->drawSegment( target_pnts[v], src_pnts[ CurveskelTypes::Vertex(closeidx) ], 2, Qt::blue);
         }
         avgDifference /= target->n_vertices();
-        double bbox_diag = src->bbox().size().length();
+        double bbox_diag = src->bbox().diagonal().norm();
         avgDifference /= bbox_diag;
     }
 

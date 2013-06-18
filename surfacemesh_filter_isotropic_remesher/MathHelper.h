@@ -35,15 +35,15 @@ static Scalar calc_dihedral_angle(SurfaceMeshModel & mesh, SurfaceMeshModel::Hal
 	Vector3FaceProperty normal = mesh.face_property<Vector3>( FNORMAL );
 	Vector3VertexProperty points = mesh.vertex_property<Vector3>( VPOINT );
 
-	const Normal& n0 = normal[mesh.face(_heh)];
-	const Normal& n1 = normal[mesh.face(mesh.opposite_halfedge(_heh))];
+    const Vector3& n0 = normal[mesh.face(_heh)];
+    const Vector3& n1 = normal[mesh.face(mesh.opposite_halfedge(_heh))];
 
-	Normal he = points[mesh.to_vertex(_heh)] - points[mesh.from_vertex(_heh)];
+    Vector3 he = points[mesh.to_vertex(_heh)] - points[mesh.from_vertex(_heh)];
 
 	Scalar da_cos = dot(n0, n1);
 
 	//should be normalized, but we need only the sign
-	Scalar da_sin_sign = dot(cross(n0, n1), he);
+    Scalar da_sin_sign = dot(n0.cross(n1), he);
 	return angle(da_cos, da_sin_sign);
 }
 
@@ -51,8 +51,8 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 {
 	Vector3 v0v1 = _v1 - _v0;
 	Vector3 v0v2 = _v2 - _v0;
-	Vector3 n = cross(v0v1, v0v2); // not normalized !
-	double d = n.sqrnorm();
+    Vector3 n = v0v1.cross(v0v2); // not normalized !
+    double d = n.squaredNorm();
 
 
 	// Check if the triangle is degenerated
@@ -66,13 +66,13 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 	// these are not needed for every point, should still perform
 	// better with many points against one triangle
 	Vector3 v1v2 = _v2 - _v1;
-	double inv_v0v2_2 = 1.0 / v0v2.sqrnorm();
-	double inv_v0v1_2 = 1.0 / v0v1.sqrnorm();
-	double inv_v1v2_2 = 1.0 / v1v2.sqrnorm();
+    double inv_v0v2_2 = 1.0 / v0v2.squaredNorm();
+    double inv_v0v1_2 = 1.0 / v0v1.squaredNorm();
+    double inv_v1v2_2 = 1.0 / v1v2.squaredNorm();
 
 
 	Vector3 v0p = _p - _v0;
-	Vector3 t = cross(v0p, n);
+    Vector3 t = v0p.cross(n);
 	double  s01, s02, s12;
 	double a = dot(t, v0v2) * -invD;
 	double b = dot(t, v0v1) * invD;
@@ -93,7 +93,7 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 				v0p = _v0 + v0v1 * s01;
 			}
 		} else if (s02 > 1.0) {
-			s12 = dot( v1v2, ( _p - _v1 )) * inv_v1v2_2;
+            s12 = dot( v1v2, Vector3(_p - _v1 )) * inv_v1v2_2;
 			if (s12 >= 1.0) {
 				v0p = _v2;
 			} else if (s12 <= 0.0) {
@@ -118,7 +118,7 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 				v0p = _v0 + v0v2 * s02;
 			}
 		} else if (s01 > 1.0) {
-			s12 = dot( v1v2, ( _p - _v1 )) * inv_v1v2_2;
+            s12 = dot( v1v2, Vector3(_p - _v1 )) * inv_v1v2_2;
 			if (s12 >= 1.0) {
 				v0p = _v2;
 			} else if (s12 <= 0.0) {
@@ -131,7 +131,7 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 		}
 	} else if (a+b > 1.0) {
 		// Calculate the distance to an edge or a corner vertex
-		s12 = dot( v1v2, ( _p - _v1 )) * inv_v1v2_2;
+        s12 = dot( v1v2, Vector3(_p - _v1 )) * inv_v1v2_2;
 		if (s12 >= 1.0) {
 			s02 = dot( v0v2, v0p ) * inv_v0v2_2;
 			if (s02 <= 0.0) {
@@ -156,12 +156,12 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 	} else {
 		// Calculate the distance to an interior point of the triangle
 		_nearestPoint = _p - n*(dot(n,v0p) * invD);
-		return (_nearestPoint - _p).sqrnorm();
+        return (_nearestPoint - _p).squaredNorm();
 	}
 
 	_nearestPoint = v0p;
 
-	return (_nearestPoint - _p).sqrnorm();
+    return (_nearestPoint - _p).squaredNorm();
 }
 
 inline double ClosestPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c, Vector3 & closest)
@@ -175,7 +175,7 @@ inline double ClosestPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c, V
     if (d1 <= 0 && d2 <= 0)
     {
         closest = a;
-        return (p-closest).sqrnorm(); // barycentric coordinates (1,0,0)
+        return (p-closest).squaredNorm(); // barycentric coordinates (1,0,0)
     }
     // Check if P in vertex region outside B
     Vec3d bp = p - b;
@@ -184,14 +184,14 @@ inline double ClosestPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c, V
     if (d3 >= 0 && d4 <= d3)
     {
         closest = b;
-        return (p-closest).sqrnorm(); // barycentric coordinates (0,1,0)
+        return (p-closest).squaredNorm(); // barycentric coordinates (0,1,0)
     }
     // Check if P in edge region of AB, if so return projection of P onto AB
     double vc = d1*d4 - d3*d2;
     if (vc <= 0 && d1 >= 0 && d3 <= 0) {
         double v = d1 / (d1 - d3);
         closest = a + v * ab;
-        return (p - closest).sqrnorm(); // barycentric coordinates (1-v,v,0)
+        return (p - closest).squaredNorm(); // barycentric coordinates (1-v,v,0)
     }
     // Check if P in vertex region outside C
     Vec3d cp = p - c;
@@ -200,28 +200,28 @@ inline double ClosestPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c, V
     if (d6 >= 0 && d5 <= d6)
     {
         closest = c;
-        return (p-closest).sqrnorm(); // barycentric coordinates (0,0,1)
+        return (p-closest).squaredNorm(); // barycentric coordinates (0,0,1)
     }
     // Check if P in edge region of AC, if so return projection of P onto AC
     double vb = d5*d2 - d1*d6;
     if (vb <= 0 && d2 >= 0 && d6 <= 0) {
         double w = d2 / (d2 - d6);
         closest = a + w * ac;
-        return (p - closest).sqrnorm(); // barycentric coordinates (1-w,0,w)
+        return (p - closest).squaredNorm(); // barycentric coordinates (1-w,0,w)
     }
     // Check if P in edge region of BC, if so return projection of P onto BC
     double va = d3*d6 - d5*d4;
     if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
         double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
         closest = b + w * (c - b);
-        return (p - closest).sqrnorm(); // barycentric coordinates (0,1-w,w)
+        return (p - closest).squaredNorm(); // barycentric coordinates (0,1-w,w)
     }
     // P inside face region. Compute Q through its barycentric coordinates (u,v,w)
     double denom = 1.0 / (va + vb + vc);
     double v = vb * denom;
     double w = vc * denom;
     closest = a + ab * v + ac * w;
-    return (p - closest).sqrnorm(); // = u*a + v*b + w*c, u = va * denom = 1 - v - w
+    return (p - closest).squaredNorm(); // = u*a + v*b + w*c, u = va * denom = 1 - v - w
 }
 
 inline static bool TestSphereTriangle(Point sphereCenter, double sphereRadius, Point a, Point b, Point c, Point &p)

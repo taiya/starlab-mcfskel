@@ -42,8 +42,8 @@ protected:
         if (!mesh->is_boundary(h0))
         {
             Point p2 = points[mesh->to_vertex(mesh->next_halfedge(h0))];
-            Point d0 = (p0 - p2).normalize();
-            Point d1 = (p1 - p2).normalize();
+            Point d0 = (p0 - p2).normalized();
+            Point d1 = (p1 - p2).normalized();
             Scalar c  = dot(d0,d1);
             if(secure){
                 c = (c<lb) ? lb:c;
@@ -55,8 +55,8 @@ protected:
         if (!mesh->is_boundary(h1))
         {
             Point p2 = points[mesh->to_vertex(mesh->next_halfedge(h1))];
-            Point d0 = (p0 - p2).normalize();
-            Point d1 = (p1 - p2).normalize();
+            Point d0 = (p0 - p2).normalized();
+            Point d1 = (p1 - p2).normalized();
             Scalar c  = dot(d0,d1);
             if(secure){
                 c = (c<lb) ? lb:c;
@@ -71,7 +71,7 @@ protected:
     }
     
     Vector3 cotangentLaplacianVector(ScalarHalfedgeProperty hweight, Vertex vit, bool autoNormalize){
-        Point l=0;
+        Point l(0,0,0);
         if( autoNormalize ){
             Scalar w=0;
             if(!mesh->is_boundary(vit)){

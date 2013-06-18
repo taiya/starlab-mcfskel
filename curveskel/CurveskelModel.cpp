@@ -9,9 +9,9 @@ CurveskelModel::CurveskelModel(QString path, QString name) : Model(path,name){}
 
 void CurveskelModel::updateBoundingBox(){
     Vector3VertexProperty vcoord = get_vertex_property<Vector3>(VCOORD);
-    _bbox.setToNull();
+    _bbox.setNull();
     foreach(Vertex v, this->vertices())
-        _bbox.unite( vcoord[v] );
+        _bbox = _bbox.merged( Eigen::AlignedBox3d( Eigen::Vector3d(vcoord[v]) ) );
 }
 
 CurveskelForEachEdgeHelper CurveskelModel::edges(){

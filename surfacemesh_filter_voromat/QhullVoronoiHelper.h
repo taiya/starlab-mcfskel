@@ -157,7 +157,7 @@ public:
 				}
 
 				// Project the loci on the vertex normal & Retain furthest 
-				double t = dot(voro_vertex - surf_vertex, surf_normal);
+                double t = dot(Vector3(voro_vertex - surf_vertex), surf_normal);
 				if(t < 0 && t < max_neg_t){
                     //drawArea->drawPoint(voro_vertex);
 					max_neg_t = t;
