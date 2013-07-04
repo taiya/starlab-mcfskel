@@ -16,7 +16,7 @@ public:
     BoolEdgeProperty efeature;
 
 private:
-    void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface=true);
+    void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface);
     void splitLongEdges(double maxEdgeLength);
     void collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength);
     void equalizeValences();

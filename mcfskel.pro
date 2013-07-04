@@ -3,7 +3,8 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 # We are loading the full core, you can also compile this independently
-#SUBDIRS += starlab-core
+SUBDIRS += core
+SUBDIRS += starlab-surfacemesh
 
 # We have imported only a PORTION of the full surfacemesh
 #SUBDIRS += starlab-surfacemesh/surfacemesh

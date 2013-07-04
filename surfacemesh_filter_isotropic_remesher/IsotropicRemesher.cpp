@@ -321,6 +321,7 @@ void IsotropicRemesher::initParameters(RichParameterSet* parameters)
     parameters->addParam(new RichInt("num_iters",10,"#Iterations", "The number of applied iterations"));
 	parameters->addParam(new RichBool("sharp_features",true,"Preserve sharp features", ""));
 	parameters->addParam(new RichFloat("sharp_features_angle",44.0,"Sharp angle max", ""));
+    parameters->addParam(new RichBool("project_surface",true,"Project to original", ""));
 
     /// We are doing re-meshing, interested in seeing the mesh edges...
     drawArea()->setRenderer(mesh(),"Flat Wire");
@@ -347,7 +348,7 @@ void IsotropicRemesher::applyFilter(RichParameterSet* pars)
 	}
 
     /// Perform refinement
-    this->remesh(longest_edge_length, num_split_iters);
+    this->remesh(longest_edge_length, num_split_iters, pars->getBool("project_surface"));
 
 	// Clean up
 	mesh()->remove_edge_property(efeature);
