@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SurfaceMeshModel.h"
+#include <limits>
 
 template <class T>
 static inline T deg_to_rad(const T& _angle)
@@ -56,9 +57,9 @@ static Scalar distPointTriangleSquared( const Vector3& _p,const Vector3& _v0,con
 
 
 	// Check if the triangle is degenerated
-	if (d < FLT_MIN && d > -FLT_MIN) {
+    if (d < std::numeric_limits<float>::min() && d > -std::numeric_limits<float>::min()) {
 		std::cerr << "distPointTriangleSquared: Degenerated triangle !\n";
-        return FLT_MAX;
+        return std::numeric_limits<float>::max();
 	}
 	double invD = 1.0 / d;
 
@@ -235,8 +236,7 @@ inline static bool TestSphereTriangle(Point sphereCenter, double sphereRadius, P
     return dot(v, v) <= sphereRadius * sphereRadius;
 }
 
-inline static bool TestSphereTriangle(Point sphereCenter, double sphereRadius, Point a, Point b, Point c)
-{
-    Vector3 p(0);
+inline static bool TestSphereTriangle(Point sphereCenter, double sphereRadius, Point a, Point b, Point c){
+    Vector3 p(0,0,0);
     return TestSphereTriangle(sphereCenter, sphereRadius, a, b, c);
 }

@@ -106,7 +106,7 @@ void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const do
             const double edgeLength = vec.squaredNorm();
 
             // edge too short but don't try to collapse edges that have length 0
-            if ( (edgeLength < _minEdgeLengthSqr) && (edgeLength > DBL_EPSILON) ){
+            if ( (edgeLength < _minEdgeLengthSqr) && (edgeLength > std::numeric_limits<double>::epsilon()) ){
 
                 //check if the collapse is ok
                 const Vector3 & B = points[v1];
