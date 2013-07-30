@@ -1,12 +1,10 @@
 #include "LaplacianRemesher.h"
 #include "SurfaceMeshHelper.h"
 #include "StarlabDrawArea.h"
+#include "LaplacianHelper.h"
 
-/// Why isn't this working well? DISABLE FOR NOW
-#undef USE_LAPLACIAN_HELPER     
-#ifdef USE_LAPLACIAN_HELPER
-    #include "helpers/LaplacianHelper.h"
-#endif
+/// @todo centralize laplacian weights computation
+#include "../surfacemesh_filter_mcfskel/CotangentLaplacianHelper.h"
 
 class SurfaceRemesher : public SurfaceMeshHelper{
 private:
@@ -17,8 +15,8 @@ public:
         this->target_edge_length = target_edge_length;
     }
     
-#ifdef USE_LAPLACIAN_HELPER    
-    void tangential_smoothing_v2(){
+#if 1
+    void tangential_smoothing(){
         /// Combinatorial and cotangent laplacians
         Vector3VertexProperty cot_laplace;
         Vector3VertexProperty com_laplace;        
@@ -29,8 +27,8 @@ public:
         
         /// Estimate the mean curvature normal
         CotangentLaplacianHelper clh(mesh);
-        clh.computeCotangentEdgeWeights();    
-        cot_laplace = clh.computeLaplacianVectors("v:cot_laplace",true);
+        ScalarHalfedgeProperty cew = clh.computeCotangentEdgeWeights();    
+        cot_laplace = clh.computeLaplacianVectors(cew,"v:cot_laplace",true);
         
         foreach(Vertex v, mesh->vertices()){
             /// Measure normal drift
@@ -114,7 +112,7 @@ public:
                 if(is_too_long(v0, v1))
                 {                
                     v = mesh->add_vertex((points[v0] + points[v1]) * 0.5);
-                    vnormal[v] = (vnormal[v0] + vnormal[v1]).normalize();
+                    vnormal[v] = (vnormal[v0] + vnormal[v1]).normalized();
                     mesh->split(e_it, v);
                     done = false;
                 }
@@ -251,7 +249,7 @@ private:
 };
 
 void LaplacianRemesher::initParameters(RichParameterSet* parameters){
-    Scalar edgelength_TH = .01*mesh()->bbox().size().length();
+    Scalar edgelength_TH = .01*mesh()->bbox().diagonal().norm();
     parameters->addParam(new RichFloat("edgelength_TH",edgelength_TH,"Target edge length", "By default it's 1% of bbox diagonal"));
     parameters->addParam(new RichInt("num_split_iters",10,"#Split cycles", "The number of applied split iterations"));
     parameters->addParam(new RichInt("num_collapse_iters",10,"#Collapse cycles", "The number of applied collapse iterations"));
