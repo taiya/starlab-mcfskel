@@ -76,7 +76,7 @@ public:
             Vector3 projectee = points[wsplitside]-p0;
             Scalar t = dot(projector, projectee);
             
-            Q_ASSERT(!isnan(t));
+            Q_ASSERT(!std::isnan(t));
             Vector3 newpos = p0 + t*projector;
             
             /// Perform the split at the desired location
