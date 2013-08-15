@@ -16,9 +16,9 @@ public:
     BoolEdgeProperty efeature;
 
 private:
-    void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface);
+    void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface, bool isKeepShortEdges = false);
     void splitLongEdges(double maxEdgeLength);
-    void collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength);
+    void collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength, bool isKeepShortEdges);
     void equalizeValences();
 	void tangentialRelaxation();
     int targetValence(const SurfaceMeshModel::Vertex &_vh);

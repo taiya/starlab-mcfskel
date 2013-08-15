@@ -5,7 +5,7 @@
 
 #include "MathHelper.h"
 
-void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool isProjectSurface )
+void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool isProjectSurface, bool isKeepShortEdges)
 {
     QElapsedTimer timer; timer.start();
 
@@ -19,7 +19,7 @@ void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool 
     for(int i = 0; i < numIterations; i++)
     {
         splitLongEdges(high);
-        collapseShortEdges(low, high);
+        collapseShortEdges(low, high, isKeepShortEdges);
         equalizeValences();
         tangentialRelaxation();
         if(isProjectSurface) projectToSurface( copy );
@@ -72,7 +72,7 @@ void IsotropicRemesher::splitLongEdges(double maxEdgeLength )
 }
 
 /// collapse edges shorter than minEdgeLength if collapsing doesn't result in new edge longer than maxEdgeLength
-void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength )
+void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const double _maxEdgeLength, bool isKeepShortEdges )
 {
     const double _minEdgeLengthSqr = _minEdgeLength * _minEdgeLength;
     const double _maxEdgeLengthSqr = _maxEdgeLength * _maxEdgeLength;
@@ -104,6 +104,10 @@ void IsotropicRemesher::collapseShortEdges(const double _minEdgeLength, const do
             const Vector3 vec = points[v1] - points[v0];
 
             const double edgeLength = vec.squaredNorm();
+
+            // Keep originally short edges, if requested
+            bool hadFeature = efeature[e_it];
+            if ( isKeepShortEdges && hadFeature ) continue;
 
             // edge too short but don't try to collapse edges that have length 0
             if ( (edgeLength < _minEdgeLengthSqr) && (edgeLength > std::numeric_limits<double>::epsilon()) ){
@@ -322,6 +326,7 @@ void IsotropicRemesher::initParameters(RichParameterSet* parameters)
 	parameters->addParam(new RichBool("sharp_features",true,"Preserve sharp features", ""));
 	parameters->addParam(new RichFloat("sharp_features_angle",44.0,"Sharp angle max", ""));
     parameters->addParam(new RichBool("project_surface",true,"Project to original", ""));
+    parameters->addParam(new RichBool("keep_shortedges",false,"Keep short edges", ""));
 
     /// We are doing re-meshing, interested in seeing the mesh edges...
     drawArea()->setRenderer(mesh(),"Flat Wire");
@@ -347,8 +352,21 @@ void IsotropicRemesher::applyFilter(RichParameterSet* pars)
 		}
 	}
 
+    // Prepare for short edges on original mesh
+    if(pars->getBool("keep_shortedges")){
+        foreach(Edge e, mesh()->edges()){
+            const SurfaceMeshModel::Halfedge & hh = mesh()->halfedge( e, 0 );
+            const SurfaceMeshModel::Vertex & v0 = mesh()->from_vertex(hh);
+            const SurfaceMeshModel::Vertex & v1 = mesh()->to_vertex(hh);
+            const Vector3 vec = points[v1] - points[v0];
+
+            if (vec.norm() <= longest_edge_length)
+                efeature[e] = true;
+        }
+    }
+
     /// Perform refinement
-    this->remesh(longest_edge_length, num_split_iters, pars->getBool("project_surface"));
+    this->remesh(longest_edge_length, num_split_iters, pars->getBool("project_surface"), pars->getBool("keep_shortedges"));
 
 	// Clean up
 	mesh()->remove_edge_property(efeature);
