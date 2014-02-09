@@ -59,5 +59,3 @@ void skeleton_resample::recursiveSplitEdge(CurveskelModel::Edge e, double thresh
     recursiveSplitEdge(skel->add_edge(v1, midVert), threshold);
     recursiveSplitEdge(skel->add_edge(v2, midVert), threshold);
 }
-
-Q_EXPORT_PLUGIN(skeleton_resample)

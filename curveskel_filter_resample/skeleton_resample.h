@@ -5,6 +5,7 @@
 
 class skeleton_resample : public CurveskelFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "skeleton_resample.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
 
 private:

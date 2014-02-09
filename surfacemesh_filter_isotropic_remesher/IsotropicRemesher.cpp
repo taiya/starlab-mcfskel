@@ -16,6 +16,11 @@ void IsotropicRemesher::remesh(double targetEdgeLength, int numIterations, bool 
     SurfaceMeshModel* copy = new SurfaceMeshModel(mesh()->path,"original");
     if(isProjectSurface) *(Surface_mesh*)copy = *(Surface_mesh*)mesh();
 
+    // Build KD-tree
+    kdtree.cloud.pts.clear();
+    foreach(Vertex v, mesh()->vertices()) kdtree.addPoint(points[v]);
+    kdtree.build();
+
     for(int i = 0; i < numIterations; i++)
     {
         splitLongEdges(high);
@@ -262,27 +267,63 @@ Vector3 IsotropicRemesher::findNearestPoint(SurfaceMeshModel * original_mesh, co
     SurfaceMeshModel::Scalar d_best = (_point - p_best).squaredNorm();
     SurfaceMeshModel::Face fh_best;
 
-    // exhaustive search
-    foreach(Face f, original_mesh->faces())
+    bool isExhaustiveSearch = false;
+
+    if( isExhaustiveSearch )
     {
-        Surface_mesh::Vertex_around_face_circulator cfv_it = original_mesh->vertices(f);
-
-        // Assume triangular
-        const Vector3& pt0 = orig_points[   cfv_it];
-        const Vector3& pt1 = orig_points[ ++cfv_it];
-        const Vector3& pt2 = orig_points[ ++cfv_it];
-
-        Vector3 ptn = _point;
-
-        //SurfaceMeshModel::Scalar d = distPointTriangleSquared( _point, pt0, pt1, pt2, ptn );
-        SurfaceMeshModel::Scalar d = ClosestPointTriangle( _point, pt0, pt1, pt2, ptn );
-
-        if( d < d_best)
+        foreach(Face f, original_mesh->faces())
         {
-            d_best = d;
-            p_best = ptn;
+            Surface_mesh::Vertex_around_face_circulator cfv_it = original_mesh->vertices(f);
 
-            fh_best = f;
+            // Assume triangular
+            const Vector3& pt0 = orig_points[   cfv_it];
+            const Vector3& pt1 = orig_points[ ++cfv_it];
+            const Vector3& pt2 = orig_points[ ++cfv_it];
+
+            Vector3 ptn = _point;
+
+            //SurfaceMeshModel::Scalar d = distPointTriangleSquared( _point, pt0, pt1, pt2, ptn );
+            SurfaceMeshModel::Scalar d = ClosestPointTriangle( _point, pt0, pt1, pt2, ptn );
+
+            if( d < d_best)
+            {
+                d_best = d;
+                p_best = ptn;
+
+                fh_best = f;
+            }
+        }
+    }
+    else
+    {
+        KDResults matches;
+        kdtree.k_closest(_point, 32, matches);
+
+        foreach(KDResultPair match, matches)
+        {
+            foreach(Halfedge h, original_mesh->onering_hedges(Vertex(match.first)))
+            {
+                Face f = original_mesh->face(h);
+
+                SurfaceMeshModel::Vertex_around_face_circulator cfv_it = original_mesh->vertices( f );
+
+                // Assume triangular
+                const Vector3& pt0 = orig_points[   cfv_it];
+                const Vector3& pt1 = orig_points[ ++cfv_it];
+                const Vector3& pt2 = orig_points[ ++cfv_it];
+
+                Vector3 ptn = _point;
+
+                SurfaceMeshModel::Scalar d = ClosestPointTriangle( _point, pt0, pt1, pt2, ptn );
+
+                if( d < d_best)
+                {
+                    d_best = d;
+                    p_best = ptn;
+
+                    fh_best = f;
+                }
+            }
         }
     }
 
@@ -371,5 +412,3 @@ void IsotropicRemesher::applyFilter(RichParameterSet* pars)
 	// Clean up
 	mesh()->remove_edge_property(efeature);
 }
-
-Q_EXPORT_PLUGIN(IsotropicRemesher)

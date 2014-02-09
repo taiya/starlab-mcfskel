@@ -54,5 +54,3 @@ void filter::applyFilter(RichParameterSet* pars){
 	}
 #endif
 }
-
-Q_EXPORT_PLUGIN(filter)

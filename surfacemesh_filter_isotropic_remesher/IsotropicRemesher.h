@@ -1,9 +1,11 @@
 #pragma once
 #include "SurfaceMeshPlugins.h"
 #include "SurfaceMeshHelper.h"
+#include "NanoKdTree.h"
 
 class IsotropicRemesher : public SurfaceMeshFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "IsotropicRemesher.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
 
 public:
@@ -14,6 +16,7 @@ public:
 
     Vector3VertexProperty points;
     BoolEdgeProperty efeature;
+    NanoKdTree kdtree;
 
 private:
     void remesh(double targetEdgeLength, int numIterations, bool isProjectSurface, bool isKeepShortEdges = false);

@@ -21,6 +21,7 @@ typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;
 
 class Skelcollapse : public SurfaceMeshFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Skelcollapse.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
     
 public:

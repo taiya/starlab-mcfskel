@@ -6,6 +6,7 @@ using namespace CurveskelTypes;
 
 class skeleton_compare : public CurveskelFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "skeleton_compare.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
 
 private:    

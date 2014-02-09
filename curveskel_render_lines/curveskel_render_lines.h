@@ -3,6 +3,7 @@
 
 class plugin : public CurveskelRenderPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "curveskel_render_lines.plugin.starlab")
     Q_INTERFACES(RenderPlugin)
 
 public:

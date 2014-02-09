@@ -29,6 +29,17 @@ std::set<Vertex> CurveskelModel::junctions()
     return j;
 }
 
+std::set<Vertex> CurveskelModel::endpoints()
+{
+    std::set<Vertex> j;
+
+    foreach(Vertex v, this->vertices())
+        if(this->valence(v) < 2)
+            j.insert(v);
+
+    return j;
+}
+
 CurveskelForEachVertexHelper CurveskelModel::vertices(){
     return CurveskelForEachVertexHelper(this);
 }

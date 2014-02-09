@@ -30,6 +30,7 @@ namespace CurveskelTypes
         /// @}
 
         std::set<Vertex> junctions();
+        std::set<Vertex> endpoints();
 
 		std::set<Vertex> adjacent_set(Vertex v);
 		Vertex other_vertex(Edge e, Vertex v);

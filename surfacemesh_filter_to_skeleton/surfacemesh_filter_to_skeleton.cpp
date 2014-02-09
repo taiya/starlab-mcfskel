@@ -141,5 +141,3 @@ void surfacemesh_filter_to_skeleton::applyFilter(RichParameterSet* /*parameters*
     skel->garbage_collection();
 	skel->print_stats();
 }
-
-Q_EXPORT_PLUGIN(surfacemesh_filter_to_skeleton)

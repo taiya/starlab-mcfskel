@@ -74,5 +74,3 @@ void skeleton_compare::applyFilter(RichParameterSet* params){
     /// @todo use dialog of sorts..
     qDebug() <<"One sided distance (bbox-norm)" << target->name << "=> " << src->name << avgDifference; 
 }
-
-Q_EXPORT_PLUGIN(skeleton_compare)

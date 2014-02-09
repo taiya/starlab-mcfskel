@@ -1,5 +1,5 @@
-load($$[STARLAB])
-load($$[CURVESKEL])
+include($$[STARLAB])
+include($$[CURVESKEL])
 StarlabTemplate(plugin)
 
 HEADERS += curveskel_io_skc.h

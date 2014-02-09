@@ -15,6 +15,7 @@ const std::string VPOLE  = "v:pole";
 
 class filter : public SurfaceMeshFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "voromat.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
 
 public:

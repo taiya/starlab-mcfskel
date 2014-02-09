@@ -1,6 +1,6 @@
-load($$[STARLAB])
-load($$[SURFACEMESH])
-load($$[CURVESKEL])
+include($$[STARLAB])
+include($$[SURFACEMESH])
+include($$[CURVESKEL])
 StarlabTemplate(plugin)
 
 HEADERS += surfacemesh_filter_to_skeleton.h

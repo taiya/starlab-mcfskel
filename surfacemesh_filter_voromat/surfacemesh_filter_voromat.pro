@@ -1,6 +1,6 @@
-load($$[STARLAB])
-load($$[SURFACEMESH])
-load($$[QHULL])
+include($$[STARLAB])
+include($$[SURFACEMESH])
+include($$[QHULL])
 StarlabTemplate(plugin)
 
 HEADERS += voromat.h
