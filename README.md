@@ -48,3 +48,4 @@ A typical usage is to load the mesh, apply a re-meshing operation, apply the *vo
 
 ## Google Summer of Code
 Xiang Gao has re-implemented this project in CGAL while participating in the CGAL Google Summer of Code 2013
+<div align="center"> <img src="/Downloads/gsoc.png" width="30%"/> </div>
