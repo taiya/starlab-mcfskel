@@ -1,6 +1,8 @@
 # Mean Curvature Skeletons
 (Automatically exported from https://code.google.com/p/starlab-mcfskel)
 
+The source & compiled binaries from the paper "Mean Curvature Skeletons". The paper is available in the download section. In the downloads you will also find pre-compiled binaries for Window, OSX and Ubuntu.
+
 ```
 @article{taglia_sgp12,
 title={Mean Curvature Skeletons},
@@ -8,6 +10,13 @@ author={Andrea Tagliasacchi and Ibraheem Alhashim and Matt Olson and Hao Zhang},
 booktitle={Computer Graphics Forum (Proc. of the Symposium on Geometry Processing)},
 year={2012}}
 ```
+
+## Downloads
+- [Paper PDF](Downloads/taglia_sgp12.pdf)
+- [Paper BibTex](Downloads/taglia_sgp12.txt)
+- [Presentation (Keynote)](taglia_sgp12.key)
+- [Demo Executable (Windows)](Downloads/mcfskel-v1.1-win32.zip)
+- [Demo Executable (OSX)](Downloads/Starlab.dmg)
 
 ## Checking out the source code 
 ```
@@ -33,9 +42,9 @@ A typical usage is to load the mesh, apply a re-meshing operation, apply the *vo
 ## Gallery
 ![](https://lh6.googleusercontent.com/-jA6ubOslwZE/T_laLl8Ki0I/AAAAAAAAnI0/b3Yc_eMJgxg/s800/code_gallery.png)
 
-## Example Video
-Click to play
+## Example Video (Click to play)
 
 [![Example](http://img.youtube.com/vi/gs5R2RhngVA/0.jpg)](http://www.youtube.com/watch?v=gs5R2RhngVA)
 
-
+## Google Summer of Code
+Xiang Gao has re-implemented this project in CGAL while participating in the CGAL Google Summer of Code 2013
