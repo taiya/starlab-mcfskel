@@ -1,0 +1,14 @@
+include($$[STARLAB])
+INCLUDEPATH += $$PWD/include
+
+# NOTE: we should also copy libusb!!!
+
+mac{
+    # CURRENT VERSION: OpenNI 2.1 BETA
+    # 1) Deply the library in the executable folder
+    QMAKE_PRE_LINK += cp -r $$PWD/lib/MacOSX/* $$EXECUTABLEPATH ;
+    # 2) Change the internal name of the library to allo relative path positioning
+    QMAKE_PRE_LINK += install_name_tool -id @executable_path/libOpenNI2.dylib $$EXECUTABLEPATH/libOpenNI2.dylib ;
+    # Then link against it
+    LIBS += $$EXECUTABLEPATH/libOpenNI2.dylib
+}

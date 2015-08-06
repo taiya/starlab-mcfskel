@@ -1,0 +1,43 @@
+message(Configuring CGAL)
+
+# MAC CONFIG FOR HOMEBREW
+mac{
+    HBPREFIX = /usr/local
+    LIBS += -L$$HBPREFIX/lib -lcgal
+    LIBS += -L$$HBPREFIX/lib -lgmp
+    INCLUDEPATH += -I$$HBPREFIX/include
+
+    ## COMPILE BUG: might be necessary for other OS too
+    DEFINES += CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES
+}
+
+# MAC CONFIG FOR LOCAL CGAL BUILT FROM SOURCE
+#mac{
+#     COMPILER
+#    CGAL_INCLUDEPATH = $$PWD/include
+#    INCLUDEPATH *= $$CGAL_INCLUDEPATH
+#    # LINKER (static) built from source by setting cmake variable BUILD_SHARED_LIBS to FALSE
+#    LIBS += $$PWD/lib/libCGAL.a
+#    LIBS += $$PWD/lib/libCGAL_ImageIO.a
+#    LIBS += $$PWD/lib/libCGAL_Core.a
+#    LIBS += $$PWD/lib/libboost_thread-mt.a
+#    LIBS += $$PWD/lib/libboost_chrono-mt.a
+#    LIBS += $$PWD/lib/libboost_system-mt.a
+#    # TODO: fix this? why static library gives me problems?
+#    #LIBS += $$PWD/lib/libgmp.a
+#    LIBS += /opt/local/lib/libgmp.dylib
+#}
+
+win32{
+    isEmpty($$(CGAL_DIR)): message(Set CGAL_DIR in your environment variables!)
+    CGAL_DIR = $$(CGAL_DIR)
+    CGAL_INCLUDEPATH = "$$CGAL_DIR"/include
+    INCLUDEPATH *= \"$$CGAL_INCLUDEPATH\"
+    DEFINES += CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES
+    DEFINES += CGAL_CFG_NO_NEXTAFTER
+    DEFINES += CGAL_CFG_NO_TR1_ARRAY
+    DEFINES += CGAL_CFG_NO_TR1_TUPLE
+    INCLUDEPATH += "C:/Program Files (x86)/CGAL-4.1/auxiliary/gmp/include"
+    LIBS += \""$$CGAL_DIR"/lib/CGAL_Core-vc100-mt.lib\"
+    LIBS += \""$$CGAL_DIR"/lib/CGAL-vc100-mt-4.1.lib\"
+}

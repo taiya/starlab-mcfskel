@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>transparent_mesh.png</file>
+    </qresource>
+</RCC>

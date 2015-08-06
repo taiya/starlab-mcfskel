@@ -1,0 +1,39 @@
+# Part of suitesparse 4.0.0
+# http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+
+DEFINES += CHOLMOD
+
+win32{
+    # static library (Windows)
+    INCLUDEPATH += $$PWD/include
+    LIBS += -L$$PWD/lib/win32 
+    LIBS += -llibcholmod -llibgoto_CHOLMOD -llibmetis_CHOLMOD -llibamd -llibcamd -llibcolamd -llibccolamd
+}
+
+mac{
+    # static library (Mac)
+    # INCLUDEPATH += $$PWD/include
+    # LIBS += -L$$PWD/lib/osx64
+    # LIBS += -lamd -lcamd -lccolamd -lcholmod -lcolamd -lcxsparse -lblas
+
+    # system libraries
+    !exists(/usr/local/lib/libcholmod.a) : error("install homebrew from the website 'brew.sh' then in the terminal run 'brew tap homebrew/science' and 'brew install suite-sparse'") 
+    !exists(/usr/lib/liblapack.dylib) : error("missing '/usr/lib/liblapack.dylib'") 
+    
+    INCLUDEPATH += /usr/local/include
+    LIBS *= -L/usr/local/lib
+    LIBS *= -lamd -lcamd -lccolamd -lcolamd -lcxsparse -lblas -lcholmod
+    LIBS *= -L/usr/lib
+    LIBS *= -llapack
+}
+
+# ubuntu 32/64 bits: take them from the OS
+unix:!mac{
+    # @todo a better way of checking for packages in linux?
+    !exists(/usr/lib/libcholmod.a):error("CHOLMOD (suitesparse) not found! sudo apt-get install libsuitesparse-dev")
+    !exists(/usr/include/suitesparse):error("SuiteSparse dev not found! sudo apt-get install libsuitesparse-dev")
+
+    INCLUDEPATH += /usr/include/suitesparse
+    LIBS *= -L/usr/lib
+    LIBS *= -lamd -lcamd -lccolamd -lcholmod -lcolamd -lcxsparse -lblas
+}

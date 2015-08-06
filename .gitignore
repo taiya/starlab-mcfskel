@@ -2,5 +2,3 @@
 .DS_Store
 data/log.txt
 *.pro.user
-/surfacemesh/
-/core/

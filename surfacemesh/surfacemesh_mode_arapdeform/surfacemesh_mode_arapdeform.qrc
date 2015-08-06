@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>surfacemesh_mode_arapdeform.png</file>
+        <file>images/anchor_points.png</file>
+        <file>images/control_points.png</file>
+        <file>images/deform.png</file>
+        <file>images/erase.png</file>
+        <file>images/paint.png</file>
+        <file>images/deform_cursor.png</file>
+    </qresource>
+</RCC>

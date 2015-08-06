@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>mode_facepaint.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,167 @@
+#include "surfacemesh_io_obj.h"
+#include "SurfaceMeshHelper.h"
+using namespace SurfaceMesh;
+
+Model* surfacemesh_io_obj::open(QString path){
+    SurfaceMeshModel* model = new SurfaceMeshModel(path);
+    
+    
+    /// Load the mesh
+    model->read(qPrintable(path));
+    return model;
+}
+
+bool read_obj(Surface_mesh& mesh, const std::string& filename)
+{
+  char   s[200];
+  float  x, y, z;
+  std::vector<Surface_mesh::Vertex>  vertices;
+
+
+  // open file (in ASCII mode)
+  FILE* in = fopen(filename.c_str(), "r");
+  if (!in) return false;
+
+
+  // if mesh is not empty we need an offset for vertex indices
+  // also take into accout that OBJ indices start at 1 (not 0)
+  const int voffset = mesh.n_vertices() - 1;
+
+
+  // clear line once
+  memset(&s, 0, 200);
+
+
+  // parse line by line (currently only supports vertex positions & faces
+  while(in && !feof(in) && fgets(s, 200, in))
+  {
+    // comment
+    if (s[0] == '#' || isspace(s[0])) continue;
+
+    // vertex
+    else if (strncmp(s, "v ", 2) == 0)
+    {
+      if (sscanf(s, "v %f %f %f", &x, &y, &z))
+      {
+        mesh.add_vertex(Surface_mesh::Point(x,y,z));
+      }
+    }
+
+    // face
+    else if (strncmp(s, "f ", 2) == 0)
+    {
+      int component(0), nV(0);
+      bool endOfVertex(false);
+      char *p0, *p1(s+1);
+
+      vertices.clear();
+
+      // skip white-spaces
+      while (*p1==' ') ++p1;
+
+      while (p1)
+      {
+        p0 = p1;
+
+        // overwrite next separator
+
+        // skip '/', '\n', ' ', '\0', '\r' <-- don't forget Windows
+        while (*p1!='/' && *p1!='\r' && *p1!='\n' && *p1!=' ' && *p1!='\0') ++p1;
+
+        // detect end of vertex
+        if (*p1 != '/')
+        {
+          endOfVertex = true;
+        }
+
+        // replace separator by '\0'
+        if (*p1 != '\0')
+        {
+          *p1 = '\0';
+          p1++; // point to next token
+        }
+
+        // detect end of line and break
+        if (*p1 == '\0' || *p1 == '\n')
+        {
+          p1 = 0;
+        }
+
+        // read next vertex component
+        if (*p0 != '\0')
+        {
+          switch (component)
+          {
+            case 0: // vertex
+              vertices.push_back( Surface_mesh::Vertex(atoi(p0) + voffset) );
+              break;
+
+            case 1: // texture coord
+              break;
+
+            case 2: // normal
+              break;
+          }
+        }
+
+        ++component;
+
+        if (endOfVertex)
+        {
+          component = 0;
+          nV++;
+          endOfVertex = false;
+        }
+      }
+
+      mesh.add_face(vertices);
+    }
+
+
+    // clear line
+    memset(&s, 0, 200);
+  }
+
+
+  fclose(in);
+  return true;
+}
+
+void surfacemesh_io_obj::save(SurfaceMeshModel* mesh,QString path){
+    FILE* fid = fopen( qPrintable(path), "w" );
+    if( fid == NULL ) throw StarlabException("the file cannot be opened");
+    
+    SurfaceMeshHelper helper(mesh);
+    Vector3VertexProperty p = helper.getVector3VertexProperty(VPOINT);
+    // bool has_vnormals = mesh->has_vertex_property<Vector3>(VNORMAL);
+    if(true /*!has_vnormals*/){
+        foreach(Vertex v, mesh->vertices())
+            fprintf( fid, "v %.10f %.10f %.10f\n", p[v].x(), p[v].y(), p[v].z() );        
+        foreach(Face f, mesh->faces()){
+            // int nV = mesh->valence(f);
+            fprintf(fid, "f");
+            Surface_mesh::Vertex_around_face_circulator fvit=mesh->vertices(f), fvend=fvit;
+            do{ fprintf(fid, " %d", ((Surface_mesh::Vertex)fvit).idx()+1);
+            } while (++fvit != fvend);
+            fprintf(fid, "\n");
+        }        
+    }
+    
+    qWarning() << "[WARNING] surfacemesh_io_obj::save() NEVER save normals";
+    fclose(fid);   
+
+#ifdef TODO_SAVE_WITH_NORMALS    
+    if(has_vnormals){
+        Vector3VertexProperty vnormals = helper.getVector3VertexProperty(VNORMAL);
+        foreach(Vertex v, mesh->vertices())
+            ; // fprintf( fid, "v %f %f %f\n", M.vertices(i,1), M.vertices(i,2), M.vertices(i,3) );        
+        foreach(Vertex v, mesh->vertices())
+            ; // fprintf( fid, "vn %f %f %f\n", VN(i,1), VN(i,2), VN(i,3) );
+        foreach(Face   f, mesh->faces())
+            ; // fprintf( fid, "f %.0f//%.0f %.0f//%.0f %.0f//%.0f\n",
+    }
+#endif
+}
+
+Q_EXPORT_PLUGIN(surfacemesh_io_obj)
+

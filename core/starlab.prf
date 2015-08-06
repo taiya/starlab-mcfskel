@@ -1,0 +1,211 @@
+#------------------------------- STARLAB.PRF -----------------------------------
+# This is the Starlab PRoject Feature (PRF) file. It allows you to use the library
+# and add plugins without having to worry too much about configuration. It is what
+# allows us to say "it just works".
+#
+# Editing this file should be done VERY carefully. These are some resources you
+# should be aware of
+# @see http://doc.qt.digia.com/latest//qmake-advanced-usage.html
+# @see http://developer.qt.nokia.com/doc/qt-4.8/qmake-variable-reference.html
+#
+# @interal Meaning of $$PWD
+#   - within a function call PWD is relative to the project file
+#   - within the body of this file it is the path of this file
+#-------------------------------------------------------------------------------
+
+#--------------------------- CHECK COMPATIBILITY -------------------------------
+#
+# Here we make sure your system compiler/configuration is compatible with Starlab
+# If this is not the case an error will be generated.
+#
+# @todo perfect all the rules
+# @todo add possibility to disable this check
+#-------------------------------------------------------------------------------
+defineTest( checkSupportedOsAndCompiler ){
+    # @todo ibraheem
+    win32: return(true)
+    # @todo return false if not 64 bits
+    mac: return(true)
+    # @todo return false if not 32 bits see "contains(QMAKE_TARGET.arch, x86_64)"
+    unix:!mac: return(true)
+    return(false)
+}
+!checkSupportedOsAndCompiler():error(Your OS/compiler is not supported.)
+
+#----------------------------- SETUP DEPLOY PATH -------------------------------
+#
+# Where will the application be deployed? The default deploy directory is the
+# starlab sources folder.
+#
+# @todo fix a better deploy rule for win32. Use a system command?
+# http://stackoverflow.com/questions/9228950/what-is-the-alternative-for-users-home-directory-on-windows-command-prompt
+#-------------------------------------------------------------------------------
+# attempt to see if user specified a path
+STARLABPREFIX = $$(STARLABPREFIX)
+isEmpty(STARLABPREFIX){
+    mac:        STARLABPREFIX = /Applications
+    win32:      STARLABPREFIX = $$(HOMEDRIVE)$$(HOMEPATH)/Desktop
+    unix:!mac:  STARLABPREFIX = $$(HOME)/Desktop
+    ## @todo this warning is useful, but it will be fired every single time
+    ##       the PRF file is loaded. Any better solution?
+    # warning(STARLABPREFIX defaulted to $$STARLABPREFIX)
+}
+
+#------------------------------- STARALB PATHS ---------------------------------
+#
+# Where do I go and look for libraries? This is highly platform dependant
+#-------------------------------------------------------------------------------
+mac:       LIBRARIESPATH  = $$STARLABPREFIX/Starlab.app/Contents/MacOS
+win32:     LIBRARIESPATH  = $$STARLABPREFIX/StarlabPackage
+unix:!mac: LIBRARIESPATH  = $$STARLABPREFIX/StarlabPackage
+mac:       EXECUTABLEPATH = $$STARLABPREFIX/Starlab.app/Contents/MacOS
+win32:     EXECUTABLEPATH = $$STARLABPREFIX/StarlabPackage
+unix:!mac: EXECUTABLEPATH = $$STARLABPREFIX/StarlabPackage
+mac:       PLUGINSPATH    = $$STARLABPREFIX/Starlab.app/plugins
+win32:     PLUGINSPATH    = $$STARLABPREFIX/StarlabPackage/plugins
+unix:!mac: PLUGINSPATH    = $$STARLABPREFIX/StarlabPackage/plugins
+
+# Windows : release folder
+win32:CONFIG(release, debug|release) {
+    LIBRARIESPATH  = $$STARLABPREFIX/StarlabPackageRelease
+    EXECUTABLEPATH = $$STARLABPREFIX/StarlabPackageRelease
+    PLUGINSPATH    = $$STARLABPREFIX/StarlabPackageRelease/plugins
+}
+
+#------------------------------- SETUP STARLIB ---------------------------------
+#
+# Starlib is the core of starlab. It's a dynamic/shared library that contains all
+# the datatypes used by all the components of starlab. Here we forcefully load
+# this component.
+#
+# @internal equals skips self-dependency
+# @internal $$basename cannot be put inside the equals call
+#-------------------------------------------------------------------------------
+PROJECTBASENAME=$$basename(_PRO_FILE_)
+!equals(PROJECTBASENAME,starlib.pro){
+    win32:      LIBS *= $$LIBRARIESPATH/starlib.lib
+    mac:        LIBS *= -L$$LIBRARIESPATH -lstarlib
+    unix:!mac:  LIBS *= -L$$LIBRARIESPATH -lstarlib
+    unix:!mac:  QMAKE_LFLAGS *= -Wl,--rpath=.
+    DEPENDPATH  *= $$PWD/starlib
+    INCLUDEPATH *= $$PWD/starlib
+    DEPENDPATH  *= $$PWD/starlib/parameters
+    INCLUDEPATH *= $$PWD/starlib/parameters
+    DEPENDPATH  *= $$PWD/starlib/interfaces
+    INCLUDEPATH *= $$PWD/starlib/interfaces
+}
+
+#---------------------- SPECIFIES TEMPLATE FOR A PROEJCT -----------------------
+# In your .pro file you call this function to specify what type of project you
+# are trying to build. This is done by calling one of:
+#
+# StarlabTemplate(plugin)
+# StarlabTemplate(sharedlib)
+# StarlabTemplate(console)
+# StarlabTemplate(appbunle)
+#
+# @todo add check to make sure nothing else is given
+#-------------------------------------------------------------------------------
+defineTest(StarlabTemplate){
+    STARLAB_TEMPLATE=$$1 #retrieve parameter
+
+    # always depend from current stuff
+    DEPENDPATH  *= $$_PRO_FILE_PWD_
+    INCLUDEPATH *= $$_PRO_FILE_PWD_
+
+    QT*=xml opengl
+
+    # LOADS EIGEN (NOT ELEGANT... WHY NOT AS QGLVIEWER?)
+    INCLUDEPATH *= $$[EIGENPATH]
+    DEFINES *= EIGEN
+
+    equals(STARLAB_TEMPLATE,"sharedlib"){
+        DESTDIR = $$LIBRARIESPATH
+        LIBNAME = $$basename(_PRO_FILE_PWD_)
+        TEMPLATE = lib
+        CONFIG += dynamiclib
+        OTHER_FILES *= *.prf
+        # even though it's not a plugin this removes the *.0.0.dylib links
+        unix:CONFIG += plugin
+        # configures rpath
+        mac:QMAKE_LFLAGS += -install_name @executable_path/lib"$$LIBNAME".dylib
+        # import / export directive in win32
+        win32:DEFINES *= DYNAMIC_$$upper($$LIBNAME)
+    }
+
+    equals(STARLAB_TEMPLATE,"plugin"){
+        QT += opengl xml
+        TEMPLATE = lib
+        CONFIG += plugin
+        DESTDIR = $$PLUGINSPATH
+        DEPENDPATH *= $$PWD
+    }
+
+    equals(STARLAB_TEMPLATE,"appbundle"){
+        TEMPLATE = app
+        DESTDIR = $$EXECUTABLEPATH
+        mac{
+            CONFIG *= app_bundle
+            BUNDLENAME = Starlab.app
+            DESTDIR=$$STARLABPREFIX
+        }
+        # PLUGINS WILL BE CLEARED ON STARLAB CLEAR
+        QMAKE_CLEAN += $$PLUGINSPATH/*
+        # App will find libraries in executable folder (NOT WORKING!)
+        # mac:QMAKE_LFLAGS += -Wl,-rpath ./
+    }
+
+    equals(STARLAB_TEMPLATE, "modelprf"){
+        LIBNAME = $$basename(PWD)
+        DEPENDPATH  *= $$PWD
+        INCLUDEPATH *= $$PWD
+        win32:      LIBS *= -L$$LIBRARIESPATH -l"$$LIBNAME"
+        mac:        LIBS *= $$LIBRARIESPATH/lib"$$LIBNAME".dylib
+        unix:!mac:  LIBS *= -L$$LIBRARIESPATH -l"$$LIBNAME"
+        unix:!mac:  QMAKE_LFLAGS *= -Wl,--rpath=.
+    }
+
+    equals(STARLAB_TEMPLATE,"console"){
+        # QT += gui # gui has to be left as QColor and others are still used
+        QT += core
+        CONFIG += console
+        CONFIG -= app_bundle
+        TEMPLATE = app
+        DESTDIR = $$EXECUTABLEPATH        
+        # App will find libraries in executable folder (NOT WORKING!)
+        # mac:QMAKE_LFLAGS += -Wl,-rpath ./
+    }
+
+    # OpenMP
+    win32{
+        QMAKE_CXXFLAGS += /openmp
+        QMAKE_CXXFLAGS += /MP
+    }
+    unix:!mac{
+        QMAKE_CXXFLAGS += -fopenmp
+        LIBS += -lgomp
+    }
+
+    # Windows specific warnings + compilation issues
+    win32{
+        DEFINES += _CRT_SECURE_NO_WARNINGS
+        DEFINES += NOMINMAX
+    }
+
+    # @internal because we are inside a function we need to "export" variables
+    export(QMAKE_CXXFLAGS)
+    export(QMAKE_LFLAGS)
+    export(QMAKE_CLEAN)
+    export(DESTDIR)
+    export(TEMPLATE)
+    export(CONFIG)
+    export(INCLUDEPATH)
+    export(DEPENDPATH)
+    export(DEFINES)
+    export(OTHER_FILES)
+    export(LIBS)
+    export(DEFINES)
+    export(VERSION)
+    export(QT)
+}
+
