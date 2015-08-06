@@ -1,0 +1,10 @@
+@inproceedings{taglia_sgp12,
+	title={Mean Curvature Skeletons},
+	author={Tagliasacchi, A. and Alhashim, I. and Olson, M. and Zhang, H.},
+	booktitle={Computer Graphics Forum (Proc. of the Symposium on Geometry Processing},
+	volume={31},
+	number={5},
+	pages={1735--1744},
+	year={2012},
+	organization={Wiley Online Library}
+}
