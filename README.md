@@ -1,3 +1,14 @@
+# Mean Curvature Skeletons
+(Automatically exported from https://code.google.com/p/starlab-mcfskel)
+
+```
+@article{taglia_sgp12,
+title={Mean Curvature Skeletons},
+author={Andrea Tagliasacchi and Ibraheem Alhashim and Matt Olson and Hao Zhang},
+booktitle={Computer Graphics Forum (Proc. of the Symposium on Geometry Processing)},
+year={2012}}
+```
+
 ## Checking out the source code 
 ```
 git clone https://code.google.com/p/starlab-mcfskel
@@ -30,15 +41,4 @@ Click to play
 
 [![Example](http://img.youtube.com/vi/gs5R2RhngVA/0.jpg)](http://www.youtube.com/watch?v=gs5R2RhngVA)
 
-## Bibtex Entry
-```
-@article{taglia_sgp12,
-title={Mean Curvature Skeletons},
-author={Andrea Tagliasacchi and Ibraheem Alhashim and Matt Olson and Hao Zhang},
-booktitle={Computer Graphics Forum (Proc. of the Symposium on Geometry Processing)},
-volume={31},
-number={5},
-pages={1735--1744},
-year={2012},
-organization={Wiley Online Library}}
-```
+
