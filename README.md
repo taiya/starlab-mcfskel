@@ -12,14 +12,11 @@ year={2012}}
 ## Checking out the source code 
 ```
 git clone https://code.google.com/p/starlab-mcfskel
-cd starlab-mcfskel
-git clone https://code.google.com/p/starlab.core core
-git clone https://code.google.com/p/starlab.surfacemesh surfacemesh
 ```
 
 Then open the file *mcfskel.pro* in `QtCreator` and perform *qmake* & *build*
 
-This is a set of plugins for the starlab environment. The set contains:
+This is a set of plugins for the starlab environment specific to this project. The set contains:
 ```
 remesher                    generates an approximately uniform mesh
 voromat                     generates a medial manifold by projecting a mesh onto the voronoi poles
