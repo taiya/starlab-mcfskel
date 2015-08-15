@@ -1,5 +1,5 @@
-load($$[STARLAB])
-load($$[CURVESKEL])
+include($$[STARLAB])
+include($$[CURVESKEL])
 StarlabTemplate(plugin)
 
 HEADERS += skeleton_resample.h

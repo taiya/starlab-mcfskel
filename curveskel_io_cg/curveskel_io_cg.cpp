@@ -84,6 +84,3 @@ void curveskel_io_cg::save(CurveskelModel* skel, QString path)
 
     out.close();
 }
-
-Q_EXPORT_PLUGIN(curveskel_io_cg)
-

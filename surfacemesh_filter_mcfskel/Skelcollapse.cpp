@@ -63,4 +63,3 @@ void Skelcollapse::updateTopology(){
     qDebug() << message;
 }
 
-Q_EXPORT_PLUGIN(Skelcollapse)

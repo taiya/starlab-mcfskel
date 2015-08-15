@@ -3,6 +3,7 @@
  
 class curveskel_io_cg : public CurveskelInputOutputPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "curveskel_io_cg.plugin.starlab")
     Q_INTERFACES(InputOutputPlugin)
     
 public:

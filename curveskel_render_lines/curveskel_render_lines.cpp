@@ -57,4 +57,3 @@ class CurveSkelLineRenderer : public CurveskelModelRenderer{
 
 Renderer* plugin::instance(){return new CurveSkelLineRenderer();}
 
-Q_EXPORT_PLUGIN(plugin)

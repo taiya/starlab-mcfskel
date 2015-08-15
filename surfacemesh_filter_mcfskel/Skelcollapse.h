@@ -21,10 +21,11 @@ typedef Surface_mesh::Vertex_property<VertexList> VertexListVertexProperty;
 
 class Skelcollapse : public SurfaceMeshFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "surfacemesh_filter_skelcollapse.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
     
 public:
-    virtual QString name() { return "MCF Skeletonization"; }
+    virtual QString name() { return "Skeleton | MCF Skeletonization"; }
     virtual QString description() { return "Performs curve-skeletonization by (medially guided) Mean Curvature Flow"; }
     virtual QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_L); }
     

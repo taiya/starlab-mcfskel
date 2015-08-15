@@ -1,6 +1,6 @@
-load($$[STARLAB])
-load($$[CHOLMOD])
-load($$[SURFACEMESH])
+include($$[STARLAB])
+include($$[CHOLMOD])
+include($$[SURFACEMESH])
 StarlabTemplate(plugin)
 
 # Uncomment to use matlab as a solver instead of eigen

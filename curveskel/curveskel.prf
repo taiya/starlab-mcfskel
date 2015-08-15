@@ -1,2 +1,2 @@
-load($$[STARLAB])
+include($$[STARLAB])
 StarlabTemplate(modelprf)

@@ -1,8 +1,8 @@
-load($$[STARLAB])
+include($$[STARLAB])
 StarlabTemplate(sharedlib)
 
 # expose library to qmake
-system(qmake -set CURVESKEL $$PWD/curveskel)
+system(qmake -set CURVESKEL $$PWD/curveskel.prf)
 OTHER_FILES += curveskel.prf
 
 # Dependencies

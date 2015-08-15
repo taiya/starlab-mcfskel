@@ -15,10 +15,11 @@ const std::string VPOLE  = "v:pole";
 
 class filter : public SurfaceMeshFilterPlugin{
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "surfacemesh_filter_voromat.plugin.starlab")
     Q_INTERFACES(FilterPlugin)
 
 public:
-    QString name() { return "Voronoi based MAT"; }
+    QString name() { return "Skeleton | Voronoi based MAT"; }
     QString description() { return "Computes voronoi embedding of a surface"; }
     QKeySequence shortcut(){ return QKeySequence(Qt::CTRL + Qt::Key_M); }    
     
