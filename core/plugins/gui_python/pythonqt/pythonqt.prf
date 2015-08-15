@@ -1,5 +1,0 @@
-load($$PWD/python.prf)
-
-# profile for non-mevis users to link to PythonQt
-INCLUDEPATH += $$PWD
-LIBS += -lpythonqt

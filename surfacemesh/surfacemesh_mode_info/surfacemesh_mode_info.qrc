@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>images/cursor-question.png</file>
-		<file>images/font.png</file>
-    </qresource>
-</RCC>

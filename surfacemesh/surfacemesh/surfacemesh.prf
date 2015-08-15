@@ -1,7 +1,0 @@
-StarlabTemplate(modelprf)
-
-INCLUDEPATH *= $$PWD/helpers
-DEPENDPATH  *= $$PWD/helpers
-
-INCLUDEPATH *= $$PWD/parameters
-DEPENDPATH  *= $$PWD/parameters

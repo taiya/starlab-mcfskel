@@ -1,4 +1,0 @@
-#--- This is a template library, no libs needed
-INCLUDEPATH *= $$PWD/include
-DEPENDPATH  *= $$PWD/include
-DEFINES *= EIGEN
