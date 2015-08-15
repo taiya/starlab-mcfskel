@@ -19,6 +19,14 @@ year={2012}}
 - [Demo Executable (OSX)](Downloads/Starlab.dmg)
 
 ## Checking out the source code 
+First checkout and compile the 'Starlab' framework:
+
+```
+git clone https://github.com/OpenGP/starlab.git
+```
+
+Then check out this repository:
+
 ```
 git clone https://github.com/ataiya/starlab-mcfskel.git
 ```
