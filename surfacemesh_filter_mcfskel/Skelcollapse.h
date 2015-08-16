@@ -57,7 +57,6 @@ public:
         parameters->addParam(new RichFloat("omega_H_0",use_matlab?20.0f:0.1f));
         parameters->addParam(new RichFloat("omega_P_0",use_matlab?40.0f:0.2f));
         parameters->addParam(new RichFloat("edgelength_TH",scale));
-        parameters->addParam(new RichFloat("alpha",0.15f));
         parameters->addParam(new RichFloat("zero_TH",1e-7f));
         
         /// Add a transparent copy of the model, must be done only when the parameter window
@@ -69,8 +68,18 @@ public:
     }
 
     void applyFilter(RichParameterSet* pars){
-        drawArea()->deleteAllRenderObjects();
-        
+		drawArea()->clear();
+
+		/// Try calling voromat plugin automatically
+		if (!mesh()->get_vertex_property<Vector3>("v:pole")){
+			FilterPlugin * vplugin = pluginManager()->getFilter("Skeleton | Voronoi based MAT");
+			if (vplugin){
+				RichParameterSet * voromat_params = new RichParameterSet;
+				vplugin->initParameters(voromat_params);
+				vplugin->applyFilter(voromat_params);
+			}
+		}
+
         { /// Retrieve parameters
             omega_L_0     = pars->getFloat("omega_L_0"); 
             omega_H_0     = pars->getFloat("omega_H_0");

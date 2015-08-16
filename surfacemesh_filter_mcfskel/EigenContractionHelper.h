@@ -169,6 +169,11 @@ void EigenContractionHelper::solveByFactorization(std::string vsolution){
     }
     // TIMER qDebug() << "Factor & Solve: " << timer.elapsed() << "ms";
     
+	if (!std::isfinite(X.norm())){
+		throw StarlabException("Problem with linear least square solution.");
+		return;
+	}
+
     /// Store solution in mesh property
     // TIMER timer.start();
     {
