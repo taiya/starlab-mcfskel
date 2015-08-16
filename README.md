@@ -1,5 +1,5 @@
 # Mean Curvature Skeletons
-(Automatically exported from https://code.google.com/p/starlab-mcfskel)
+(Originaly exported from https://code.google.com/p/starlab-mcfskel)
 
 The source & compiled binaries from the paper "Mean Curvature Skeletons". The paper is available in the download section. In the downloads you will also find pre-compiled binaries for Window, OSX and Ubuntu.
 
@@ -19,15 +19,22 @@ year={2012}}
 - [Demo Executable (OSX)](Downloads/Starlab.dmg)
 
 ## Checking out the source code 
+First checkout and compile the 'Starlab' framework:
+
 ```
-git clone https://code.google.com/p/starlab-mcfskel
+git clone https://github.com/OpenGP/starlab.git
+```
+
+Then check out this repository:
+
+```
+git clone https://github.com/ataiya/starlab-mcfskel.git
 ```
 
 Then open the file *mcfskel.pro* in `QtCreator` and perform *qmake* & *build*
 
 This is a set of plugins for the starlab environment specific to this project. The set contains:
 ```
-remesher                    generates an approximately uniform mesh
 voromat                     generates a medial manifold by projecting a mesh onto the voronoi poles
 mcfskel                     mean curvature skeletonization (with medial guidance)
 surfacemesh_to_skeleton     a simple plugin to convert contracted meshes into curve-skeletons 
