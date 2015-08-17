@@ -4,7 +4,6 @@
 #include <QElapsedTimer>
 #include <Eigen/Core>
 #include <Eigen/Sparse>
-#include <Eigen/CholmodSupport>
 #include "SurfaceMeshHelper.h"
 #include "CotangentLaplacianHelper.h"
 #include "Logfile.h"
@@ -190,16 +189,16 @@ void EigenContractionHelper::solve_linear_least_square(SparseMatrix<double> & A,
     // tic(" CholFactor");
         SparseMatrix<double> At  = A.transpose();
         SparseMatrix<double> AtA = At * A;
-        typedef CholmodDecomposition< SparseMatrix<double> > Solver;
-        //typedef SimplicialLDLT< SparseMatrix<double> > Solver;
+        //typedef CholmodDecomposition< SparseMatrix<double> > Solver;
+        typedef SimplicialLDLT< SparseMatrix<double> > Solver;
         Solver solver;
         solver.compute(AtA);
     // toc();
     
     /// 3x Solves
     // tic(" Back-Substitution");
-        X.col(0) = solver.solve( At * B.col(0) );
-        X.col(1) = solver.solve( At * B.col(1) );
-        X.col(2) = solver.solve( At * B.col(2) );
+		X.col(0) = solver.solve(At * B.col(0));
+		X.col(1) = solver.solve(At * B.col(1));
+		X.col(2) = solver.solve(At * B.col(2));
     // toc();
 }
